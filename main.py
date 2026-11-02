@@ -43,7 +43,6 @@ class AppCard(tk.Frame):
     def on_click(self, event):
         self.command()
 
-
 class CentralHomepage(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -90,7 +89,7 @@ class CentralHomepage(tk.Tk):
         cards_frame = tk.Frame(self, bg="#f5f5f5")
         cards_frame.pack(fill="both", expand=True, padx=40)
 
-        # Card 1: EU Deduplication
+        
         card_eu = AppCard(
             cards_frame,
             title="EU Deduplication & Remap",
@@ -100,7 +99,7 @@ class CentralHomepage(tk.Tk):
         )
         card_eu.pack(side="left", fill="both", expand=True, padx=15, pady=15)
 
-        # Card 2: Facility Matching
+        
         card_fuzzy = AppCard(
             cards_frame,
             title="Facility Matching (Fuzzy & GPO)",
@@ -110,7 +109,7 @@ class CentralHomepage(tk.Tk):
         )
         card_fuzzy.pack(side="left", fill="both", expand=True, padx=15, pady=15)
 
-        # Card 3: Project Data Laundry
+        
         card_project = AppCard(
             cards_frame,
             title="Data Laundry & Matching",
@@ -142,11 +141,9 @@ class CentralHomepage(tk.Tk):
         win.destroy()
         self.deiconify()
 
-
 def main():
     app = CentralHomepage()
     app.mainloop()
-
 
 if __name__ == "__main__":
     main()

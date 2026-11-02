@@ -9,7 +9,6 @@ from project_app.ui.data_laundry_page import DataLaundryPage
 from project_app.ui.matching_page import DataMatchingPage
 from project_app.ui.distance_page import DistanceMatchingPage
 
-
 class MDMApp:
     """Main application shell with tool switcher for Laundry and Matching."""
 
@@ -45,11 +44,10 @@ class MDMApp:
         self.shared_workspace_var = tk.StringVar(value=str(get_workspace_path()))
         self.shared_schema_var = tk.StringVar(value=get_last_schema())
 
-        # Instantiate all pages as tabs using the shared string variables
+        
         self.laundry_page = DataLaundryPage(self.notebook, self.connection_settings, self.shared_workspace_var, self.shared_schema_var)
         self.matching_page = DataMatchingPage(self.notebook, self.connection_settings, self.shared_workspace_var, self.shared_schema_var)
         self.distance_page = DistanceMatchingPage(self.notebook, self.connection_settings, self.shared_workspace_var, self.shared_schema_var)
-
 
         self.notebook.add(self.laundry_page, text="Data Laundry")
         self.notebook.add(self.matching_page, text="Data Matching")

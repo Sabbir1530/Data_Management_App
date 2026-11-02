@@ -29,14 +29,13 @@ try:
     from google import genai
     from google.genai import types
     from google.genai.errors import APIError
-except ImportError as _imp_err:  # pragma: no cover - surfaced to the user at call time
+except ImportError as _imp_err:  
     genai = None
     types = None
     APIError = Exception
     _import_error = _imp_err
 else:
     _import_error = None
-
 
 BATCH_SIZE = 50
 MAX_CONCURRENT_REQUESTS = 15
@@ -45,7 +44,6 @@ MODEL_NAME = "gemini-2.5-flash"
 RESULT_COLUMNS = [
     "result", "result_reason", "confidence", "entity_1_parent", "entity_2_parent",
 ]
-
 
 system_instruction = (
     "Your task is to determine if two healthcare entities refer to the SAME organization, are AFFILIATED, or are DIFFERENT organizations.\n\n"
@@ -87,10 +85,8 @@ system_instruction = (
     "}"
 )
 
-
 class AIMatchingUnavailable(RuntimeError):
     """Raised when the google-genai stack or an API key is not available."""
-
 
 def ensure_available() -> None:
     if _import_error is not None:
@@ -103,7 +99,6 @@ def ensure_available() -> None:
             "GEMINI_API_KEY is missing. Set it in your environment or in a .env file next to the app."
         )
 
-
 def _make_client(api_key: Optional[str] = None):
     key = (api_key or os.getenv("GEMINI_API_KEY") or "").strip()
     if not key:
@@ -111,7 +106,6 @@ def _make_client(api_key: Optional[str] = None):
             "GEMINI_API_KEY is missing. Set it in your environment or in a .env file next to the app."
         )
     return genai.Client(api_key=key)
-
 
 async def _call_gemini(client, semaphore, bp_name, bp_addr, dm_name, dm_addr) -> EntityMatchDecision:
     prompt = f"""
@@ -155,7 +149,6 @@ Address: {dm_addr}
             entity_2_parent=None,
         )
 
-
 async def _process_batch(client, semaphore, batch_df: pd.DataFrame):
     tasks = [
         _call_gemini(
@@ -166,7 +159,6 @@ async def _process_batch(client, semaphore, batch_df: pd.DataFrame):
         for _, row in batch_df.iterrows()
     ]
     return await asyncio.gather(*tasks)
-
 
 async def _classify_async(
     df: pd.DataFrame,
@@ -221,7 +213,6 @@ async def _classify_async(
     errors = int((out["result"] == "ERROR").sum())
     log(f"AI classification done — SAME={same}, AFFILIATED={affiliated}, DIFFERENT={different}, ERROR={errors}.")
     return out
-
 
 def classify_candidates(
     df: pd.DataFrame,

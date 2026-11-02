@@ -27,7 +27,6 @@ SYNONYM_MAP = {
     "CLINIC": {"CLIN"},
 }
 
-
 def clean_str(value):
     if value is None:
         return ""
@@ -38,7 +37,6 @@ def clean_str(value):
         pass
     val_str = str(value).strip()
     return "" if val_str.lower() == "nan" else val_str
-
 
 @lru_cache(maxsize=500_000)
 def are_words_matching(w1, w2, similarity_threshold=0.82):
@@ -53,14 +51,12 @@ def are_words_matching(w1, w2, similarity_threshold=0.82):
             return True
     return False
 
-
 def normalize_match_text(value):
     val_str = clean_str(value)
     if not val_str:
         return ""
     text = re.sub(r"[^A-Z0-9]+", " ", val_str.upper())
     return re.sub(r"\s+", " ", text).strip()
-
 
 def get_common_word_matches(text_a, text_b):
     tokens_a = re.findall(r"\b\w+\b", normalize_match_text(text_a))
@@ -72,7 +68,6 @@ def get_common_word_matches(text_a, text_b):
                 matches_a.add(t_a.upper())
                 matches_b.add(t_b.upper())
     return matches_a, matches_b
-
 
 def build_highlight_segments(text, match_set):
     """Return list of (substring, is_highlighted) covering the whole text,
@@ -91,7 +86,6 @@ def build_highlight_segments(text, match_set):
     if not segments:
         segments = [(text, False)]
     return segments
-
 
 def score_and_highlight(text_a, text_b):
     str_a = clean_str(text_a)
@@ -121,7 +115,6 @@ def score_and_highlight(text_a, text_b):
     seg_b = build_highlight_segments(str_b, matches_b)
     return score, True, seg_a, seg_b
 
-
 def analyze_candidate_row(row):
     name_score, name_has_sim, seg_orig_nm, seg_cm_nm = score_and_highlight(
         row.get("UPD_NM_1", ""), row.get("CMPNY_NM", "")
@@ -144,12 +137,10 @@ def analyze_candidate_row(row):
         "_seg_cm_addr": seg_cm_addr,
     }
 
-
 ANALYSIS_COLUMNS = [
     "_similarity_score", "_has_similarity", "_name_score", "_addr_score",
     "_seg_orig_nm", "_seg_cm_nm", "_seg_orig_addr", "_seg_cm_addr",
 ]
-
 
 def build_similarity_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     if df.empty:
@@ -169,9 +160,7 @@ def build_similarity_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-# =================================================================
-# SQL identifier helpers & task definitions
-# =================================================================
+
 def sanitize_identifier(identifier: str) -> str:
     if not identifier:
         return ""
@@ -180,13 +169,11 @@ def sanitize_identifier(identifier: str) -> str:
         raise ValueError(f"Invalid characters detected in database object name: '{identifier}'")
     return cleaned
 
-
 def sql_table(database: str, schema: str, table: str) -> str:
     safe_db = sanitize_identifier(database)
     safe_schema = sanitize_identifier(schema)
     safe_table = sanitize_identifier(table)
     return f"[{safe_db}].[{safe_schema}].[{safe_table}]"
-
 
 def get_installed_sql_drivers():
     """Prefer modern ODBC drivers (17/18); fall back to legacy SQL Server."""
@@ -204,10 +191,9 @@ def get_installed_sql_drivers():
     ordered = [d for d in preferred if d in available]
     if ordered:
         return ordered
-    # any other SQL-related driver
+    
     extras = [d for d in available if "SQL" in d]
     return extras if extras else ["SQL Server"]
-
 
 TASKS = {
     "Task 1: Match by HIN": {
@@ -350,7 +336,6 @@ TASKS = {
 
 TASK_KEYS = list(TASKS.keys())
 
-# Tasks 4 through 7, in run order, for the one-click "Auto-Match (AI)" workflow.
 AUTO_MATCH_TASK_KEYS = [
     k for k in TASK_KEYS
     if k.startswith(("Task 4:", "Task 5:", "Task 6:", "Task 7:"))
@@ -359,7 +344,6 @@ AUTO_MATCH_TASK_KEYS = [
 STAGING_INSERT_BATCH_SIZE = 5000
 SORT_OPTIONS = {"Similarity: High to Low": False, "Similarity: Low to High": True}
 PAGE_SIZE_OPTIONS = [10, 25, 50, 100]
-
 
 def build_pyodbc_conn_str(
     server: str,
@@ -396,14 +380,13 @@ def build_pyodbc_conn_str(
         parts.append(f"PWD={password}")
 
     if modern:
-        # Driver 17/18: explicit encrypt + trust (defaults match login dialog)
+        
         parts.append(f"Encrypt={'yes' if encrypt else 'no'}")
         parts.append(f"TrustServerCertificate={'yes' if trust_server_certificate else 'no'}")
-    # Legacy driver: omit Encrypt/TrustServerCertificate (invalid attributes)
+    
 
     parts.append("Network=DBMSSOCN")
     return ";".join(parts) + ";"
-
 
 def run_match_query(
     server, database, username, password, query, params=None,
@@ -418,7 +401,6 @@ def run_match_query(
         return pd.read_sql(query, conn, params=params)
     finally:
         conn.close()
-
 
 def ensure_mtch_mthd_column(cursor, database: str, schema: str, log=None) -> None:
     """Add MTCH_MTHD column to TEMP_NAME_ADDR_PRCS if it does not already exist.
@@ -449,7 +431,6 @@ def ensure_mtch_mthd_column(cursor, database: str, schema: str, log=None) -> Non
         f"ALTER TABLE {target} ADD MTCH_MTHD NVARCHAR(20) NULL;"
     )
 
-
 def commit_matches(
     server, database, username, password, schema, update_rows,
     auth_mode="sql", trust_server_certificate=True, encrypt=False,
@@ -465,7 +446,7 @@ def commit_matches(
     """
     log = log or (lambda m: None)
     progress = progress or (lambda p: None)
-    # Accept any non-empty method code. Only default when caller passes None / blank.
+    
     method = (match_method or "").strip().upper() or "NAD_MN"
 
     conn_str = build_pyodbc_conn_str(
@@ -487,7 +468,7 @@ def commit_matches(
         except Exception:
             pass
 
-        # Ensure MTCH_MTHD exists before we write (idempotent; no-op if already present)
+        
         ensure_mtch_mthd_column(cursor, database, schema, log=log)
 
         cursor.execute("""

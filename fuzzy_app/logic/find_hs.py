@@ -31,11 +31,11 @@ Location: {city}, {state} {zip_val}
 
 REQUIRED OUTPUT FORMAT:
 Return ONLY a valid JSON object without markdown formatting or code blocks:
-{{
+{ 
   "is_under_target_system": true/false,
   "health_system_name": "Parent Health System Name" | "Parent Health System Name (Clinic Name)" | "Multiple" | null,
   "Relation": "Exact Relationship"
-}}
+} 
 """
 
     system_instruction = f"""You are an expert healthcare data intelligence analyst mapping corporate affiliations. 
@@ -91,7 +91,7 @@ Return ONLY a valid JSON object without markdown formatting or code blocks:
                 if start_idx != -1 and end_idx != -1 and end_idx > start_idx:
                     text = text[start_idx:end_idx+1]
                 elif start_idx == -1 and end_idx != -1:
-                    # Sometimes the model forgets the opening brace
+                    
                     text = "{" + text[:end_idx+1]
                     start_idx = text.find('{')
                     text = text[start_idx:end_idx+2]
@@ -99,7 +99,7 @@ Return ONLY a valid JSON object without markdown formatting or code blocks:
                 try:
                     result = AffiliationLookup.model_validate_json(text)
                 except Exception as parse_e:
-                    # Let's see if we can find a JSON block using regex if basic slicing failed
+                    
                     import re
                     match = re.search(r'\{.*\}', response.text, re.DOTALL)
                     if match:

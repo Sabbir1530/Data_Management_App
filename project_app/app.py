@@ -8,7 +8,6 @@ from shared.services.database import create_database_engine
 from shared.ui.connection_dialog import ConnectionDialog
 from project_app.ui.main_window import MDMApp
 
-
 def _probe_connection(settings) -> bool:
     try:
         engine = create_database_engine(settings, settings.database or "master")
@@ -19,12 +18,10 @@ def _probe_connection(settings) -> bool:
         print(f"[WARN] Saved connection failed: {exc}", flush=True)
         return False
 
-
 def _prompt_login(root, force: bool = False):
     dlg = ConnectionDialog(root, force=force)
     root.wait_window(dlg)
     return getattr(dlg, "result", None)
-
 
 class ProjectAppWindow(tk.Toplevel):
     def __init__(self, master=None):

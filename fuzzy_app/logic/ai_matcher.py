@@ -22,7 +22,6 @@ logger = logging.getLogger("ai_matcher")
 TARGET_COLUMNS = ["result", "relation", "entity_1_parent", "entity_2_parent",
                    "confidence", "result_reason"]
 
-
 class EntityMatchDecision(BaseModel):
     result: str = Field(description="One of: 'SAME', 'AFFILIATED', 'DIFFERENT'.")
     relation: str = Field(description="One of: 'SELF','OWNED','OPERATED','MANAGED',"
@@ -31,7 +30,6 @@ class EntityMatchDecision(BaseModel):
     entity_2_parent: Optional[str] = Field(default=None)
     confidence: int = Field(default=0)
     reason: str = Field(default="")
-
 
 SYSTEM_INSTRUCTION = (
     "Your task is to determine if two healthcare entities refer to the SAME organization, are AFFILIATED, or are DIFFERENT organizations.\n\n"
@@ -73,7 +71,6 @@ SYSTEM_INSTRUCTION = (
     "}"
 )
 
-
 def _build_prompt(name1, addr1, city1, name2, addr2, city2):
     return f"""Compare the following two healthcare organizational entities and determine
 their relationship category.
@@ -88,7 +85,6 @@ Name: {name2}
 Address: {addr2}
 City: {city2}
 """
-
 
 async def _call_gemini(client, semaphore, name1, addr1, city1, name2, addr2, city2, model, use_grounding=False):
     from google.genai import types
@@ -187,7 +183,6 @@ async def _call_gemini(client, semaphore, name1, addr1, city1, name2, addr2, cit
             reason="Failed to process due to persistent API or parsing timeouts.",
         )
 
-
 async def _process_batch(client, semaphore, batch_df, name1_col, addr1_col, city1_col,
                           name2_col, addr2_col, city2_col, model, use_grounding=False):
     tasks = [
@@ -200,7 +195,6 @@ async def _process_batch(client, semaphore, batch_df, name1_col, addr1_col, city
         for _, row in batch_df.iterrows()
     ]
     return await asyncio.gather(*tasks)
-
 
 def run_ai_matching(
     df,
@@ -241,7 +235,7 @@ def run_ai_matching(
             df[col] = df[col].apply(lambda x: str(x).strip() if pd.notna(x) and x is not None else None)
             df[col] = df[col].replace({"nan": None, "NaN": None, "None": None, "<NA>": None, "": None})
 
-    # Explicitly enforce object dtype to avoid string/float dtype conflicts when inserting mixed values
+    
     for col in TARGET_COLUMNS:
         df[col] = df[col].astype(object)
 
@@ -336,9 +330,7 @@ def run_ai_matching(
     return df, output_excel, html_path, stats
 
 
-# ---------------------------------------------------------------------------
-# HTML report (same visual style as the original script)
-# ---------------------------------------------------------------------------
+
 
 def _generate_html_report(df, output_file, name1_col, addr1_col, city1_col, name2_col, addr2_col, city2_col, stats):
     html_content = f"""<!DOCTYPE html>
@@ -348,39 +340,39 @@ def _generate_html_report(df, output_file, name1_col, addr1_col, city1_col, name
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Entity Matching Report</title>
 <style>
-*{{margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial,sans-serif;}}
-body{{background:#f8f9fb;padding:40px;min-height:100vh;}}
-.header{{margin-bottom:35px;background:white;padding:32px 28px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:6px solid #047857;}}
-.header h1{{color:#1a202c;font-size:36px;font-weight:700;letter-spacing:-.5px;margin-bottom:20px;}}
-.header-meta{{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;}}
-.header-item{{display:flex;flex-direction:column;}}
-.header-label{{font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;}}
-.header-value{{font-size:16px;font-weight:600;color:#1a202c;}}
-.summary{{display:flex;gap:20px;margin-bottom:35px;}}
-.stat{{flex:1;background:white;padding:28px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);}}
-.stat h2{{font-size:40px;margin-bottom:8px;font-weight:700;letter-spacing:-.5px;}}
-.stat p{{font-weight:500;font-size:14px;letter-spacing:.3px;}}
-.same-stat{{border-left:5px solid #047857;}}.same-stat h2{{color:#047857;}}.same-stat p{{color:#5a6b6f;}}
-.aff-stat{{border-left:5px solid #b45309;}}.aff-stat h2{{color:#b45309;}}.aff-stat p{{color:#5a6b6f;}}
-.diff-stat{{border-left:5px solid #b91c1c;}}.diff-stat h2{{color:#b91c1c;}}.diff-stat p{{color:#5a6b6f;}}
-.card{{background:white;border-radius:12px;margin-bottom:20px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);}}
-.card.same{{border-left:5px solid #047857;}}.card.affiliated{{border-left:5px solid #b45309;}}.card.different{{border-left:5px solid #b91c1c;}}.card.error{{border-left:5px solid #4b5563;}}
-.top{{display:flex;align-items:center;justify-content:space-between;padding:28px;background:white;}}
-.entity{{width:40%;}}.entity h3{{font-size:20px;color:#111827;margin-bottom:8px;}}.entity p{{font-size:13px;color:#6b7280;line-height:1.5;}}
-.parent-info{{font-size:12px;font-weight:bold;color:#4b5563;margin-top:6px;}}
-.middle{{width:20%;text-align:center;}}
-.badge{{display:inline-block;padding:8px 18px;border-radius:6px;color:white;font-weight:600;letter-spacing:.3px;font-size:12px;text-transform:uppercase;}}
-.sub-badge{{display:block;margin-top:6px;font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;}}
-.same-badge{{background:#047857;}}.affiliated-badge{{background:#b45309;}}.different-badge{{background:#b91c1c;}}.error-badge{{background:#4b5563;}}
-.reason{{background:#f9fafb;border-top:1px solid #e5e7eb;padding:22px 28px;}}
-.reason-title{{font-weight:600;color:#1a202c;margin-bottom:10px;font-size:13px;text-transform:uppercase;letter-spacing:.4px;}}
-.reason-text{{color:#5a6b6f;line-height:1.6;font-size:14px;}}
-.category-section{{margin-bottom:50px;}}
-.category-header{{display:flex;align-items:center;gap:12px;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid #e5e7eb;}}
-.category-header h2{{font-size:22px;font-weight:700;color:#1a202c;margin:0;}}
-.category-badge{{display:inline-block;padding:6px 14px;border-radius:6px;color:white;font-weight:600;font-size:11px;text-transform:uppercase;}}
-.category-same .category-badge{{background:#047857;}}.category-affiliated .category-badge{{background:#b45309;}}.category-different .category-badge{{background:#b91c1c;}}
-.count-badge{{background:#6b7280;color:white;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;margin-left:auto;}}
+*{ margin:0;padding:0;box-sizing:border-box;font-family:Segoe UI,Arial,sans-serif;} 
+body{ background:#f8f9fb;padding:40px;min-height:100vh;} 
+.header{ margin-bottom:35px;background:white;padding:32px 28px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);border-left:6px solid #047857;} 
+.header h1{ color:#1a202c;font-size:36px;font-weight:700;letter-spacing:-.5px;margin-bottom:20px;} 
+.header-meta{ display:grid;grid-template-columns:repeat(3,1fr);gap:24px;} 
+.header-item{ display:flex;flex-direction:column;} 
+.header-label{ font-size:12px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.3px;margin-bottom:6px;} 
+.header-value{ font-size:16px;font-weight:600;color:#1a202c;} 
+.summary{ display:flex;gap:20px;margin-bottom:35px;} 
+.stat{ flex:1;background:white;padding:28px;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,.06);} 
+.stat h2{ font-size:40px;margin-bottom:8px;font-weight:700;letter-spacing:-.5px;} 
+.stat p{ font-weight:500;font-size:14px;letter-spacing:.3px;} 
+.same-stat{ border-left:5px solid #047857;} .same-stat h2{ color:#047857;} .same-stat p{ color:#5a6b6f;} 
+.aff-stat{ border-left:5px solid #b45309;} .aff-stat h2{ color:#b45309;} .aff-stat p{ color:#5a6b6f;} 
+.diff-stat{ border-left:5px solid #b91c1c;} .diff-stat h2{ color:#b91c1c;} .diff-stat p{ color:#5a6b6f;} 
+.card{ background:white;border-radius:12px;margin-bottom:20px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.06);} 
+.card.same{ border-left:5px solid #047857;} .card.affiliated{ border-left:5px solid #b45309;} .card.different{ border-left:5px solid #b91c1c;} .card.error{ border-left:5px solid #4b5563;} 
+.top{ display:flex;align-items:center;justify-content:space-between;padding:28px;background:white;} 
+.entity{ width:40%;} .entity h3{ font-size:20px;color:#111827;margin-bottom:8px;} .entity p{ font-size:13px;color:#6b7280;line-height:1.5;} 
+.parent-info{ font-size:12px;font-weight:bold;color:#4b5563;margin-top:6px;} 
+.middle{ width:20%;text-align:center;} 
+.badge{ display:inline-block;padding:8px 18px;border-radius:6px;color:white;font-weight:600;letter-spacing:.3px;font-size:12px;text-transform:uppercase;} 
+.sub-badge{ display:block;margin-top:6px;font-size:11px;font-weight:700;color:#374151;text-transform:uppercase;} 
+.same-badge{ background:#047857;} .affiliated-badge{ background:#b45309;} .different-badge{ background:#b91c1c;} .error-badge{ background:#4b5563;} 
+.reason{ background:#f9fafb;border-top:1px solid #e5e7eb;padding:22px 28px;} 
+.reason-title{ font-weight:600;color:#1a202c;margin-bottom:10px;font-size:13px;text-transform:uppercase;letter-spacing:.4px;} 
+.reason-text{ color:#5a6b6f;line-height:1.6;font-size:14px;} 
+.category-section{ margin-bottom:50px;} 
+.category-header{ display:flex;align-items:center;gap:12px;margin-bottom:25px;padding-bottom:15px;border-bottom:2px solid #e5e7eb;} 
+.category-header h2{ font-size:22px;font-weight:700;color:#1a202c;margin:0;} 
+.category-badge{ display:inline-block;padding:6px 14px;border-radius:6px;color:white;font-weight:600;font-size:11px;text-transform:uppercase;} 
+.category-same .category-badge{ background:#047857;} .category-affiliated .category-badge{ background:#b45309;} .category-different .category-badge{ background:#b91c1c;} 
+.count-badge{ background:#6b7280;color:white;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600;margin-left:auto;} 
 </style>
 </head>
 <body>

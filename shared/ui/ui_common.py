@@ -9,16 +9,13 @@ import subprocess
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
-# ---------------------------------------------------------------------------
-# Column name auto-guessing
-# ---------------------------------------------------------------------------
+
 
 def _tokenize(col_name):
     """Split a column name into lowercase word tokens (handles _, -, spaces,
     camelCase) so we can match whole words instead of raw substrings."""
     spaced = re.sub(r"(?<=[a-z0-9])(?=[A-Z])", " ", col_name)
     return [t for t in re.split(r"[^a-zA-Z0-9]+", spaced.lower()) if t]
-
 
 def guess_column(columns, exact_candidates=None, contains_tokens=None, fallback=None, required=True, reverse=False):
     """Try to auto-detect a column by exact name match first, then a
@@ -54,17 +51,17 @@ def guess_column(columns, exact_candidates=None, contains_tokens=None, fallback=
     if contains_tokens:
         toks = [t.lower() for t in contains_tokens]
 
-        # Pass 1: whole-word match (e.g. "lat" matches "Latitude" split as
-        # ["latitude"]... so also allow a token to be a prefix of a word,
-        # which still avoids accidental mid-word hits like "Related").
+        
+        
+        
         for c in cols_to_search:
             words = _tokenize(c)
             for tok in toks:
                 if tok in words or any(w.startswith(tok) and len(tok) >= 3 for w in words):
                     return c
 
-        # Pass 2 (last resort): raw substring match, kept for backward
-        # compatibility with odd column names that don't tokenize cleanly.
+        
+        
         for c in cols_to_search:
             cl = c.lower()
             for tok in toks:
@@ -78,9 +75,7 @@ def guess_column(columns, exact_candidates=None, contains_tokens=None, fallback=
     return columns[0]
 
 
-# ---------------------------------------------------------------------------
-# Color palette + theming
-# ---------------------------------------------------------------------------
+
 
 PALETTE = {
     "bg": "#f4f6fb",
@@ -96,7 +91,6 @@ PALETTE = {
     "muted": "#6b7280",
     "border": "#dfe3ee",
 }
-
 
 def apply_theme(root):
     """Apply a colorful, consistent ttk theme across the whole app.
@@ -135,8 +129,8 @@ def apply_theme(root):
         foreground=[("selected", "white"), ("!selected", PALETTE["navy"])],
     )
 
-    # Default/plain buttons ("Choose...", "Open ... Excel", etc.) — navy
-    # text on a light background, guaranteed readable under 'clam'.
+    
+    
     style.configure(
         "TButton", padding=6, font=("Segoe UI", 9),
         background="#eef0fa", foreground=PALETTE["navy"],
@@ -180,9 +174,7 @@ def apply_theme(root):
     return style
 
 
-# ---------------------------------------------------------------------------
-# File / folder helpers
-# ---------------------------------------------------------------------------
+
 
 def browse_excel(title="Select Data File"):
     path = filedialog.askopenfilename(
@@ -191,17 +183,15 @@ def browse_excel(title="Select Data File"):
     )
     return path or None
 
-
 def browse_folder(title="Select Folder"):
     path = filedialog.askdirectory(title=title)
     return path or None
-
 
 def open_path(path):
     """Open a file or folder with the OS default application."""
     try:
         if sys.platform.startswith("win"):
-            os.startfile(path)  # noqa
+            os.startfile(path)  
         elif sys.platform == "darwin":
             subprocess.Popen(["open", path])
         else:
@@ -209,14 +199,11 @@ def open_path(path):
     except Exception as e:
         messagebox.showerror("Could not open", f"Couldn't open:\n{path}\n\n{e}")
 
-
 def show_error(title, err):
     messagebox.showerror(title, str(err))
 
-
 def show_info(title, msg):
     messagebox.showinfo(title, msg)
-
 
 def save_dataframe(df, default_path):
     """
@@ -240,9 +227,7 @@ def save_dataframe(df, default_path):
     return path
 
 
-# ---------------------------------------------------------------------------
-# Reusable widgets
-# ---------------------------------------------------------------------------
+
 
 class LabeledCombo(ttk.Frame):
     """A label + combobox pair, used for column selection dropdowns.
@@ -265,12 +250,12 @@ class LabeledCombo(ttk.Frame):
 
     def set_values(self, values, default=None):
         self.combo["values"] = values
-        # For editable combos (Latitude/Longitude, where the guessed name may
-        # not exist yet as a real column, or where we deliberately pass a
-        # blank/None default to avoid guessing wrong), honor `default`
-        # exactly rather than silently falling back to the first column —
-        # that silent fallback previously caused the wrong column to get
-        # selected behind the user's back.
+        
+        
+        
+        
+        
+        
         if default is not None and (default in values or self.editable):
             self.var.set(default)
         elif default is None and self.editable:
@@ -289,7 +274,6 @@ class LabeledCombo(ttk.Frame):
     def set(self, value):
         self.var.set(value or "")
 
-
 class LabeledEntry(ttk.Frame):
     """A label + text entry pair."""
 
@@ -306,7 +290,6 @@ class LabeledEntry(ttk.Frame):
 
     def set(self, value):
         self.var.set(value)
-
 
 class FilePicker(ttk.Frame):
     """A label + path display + Browse button for choosing an Excel file."""
@@ -334,7 +317,6 @@ class FilePicker(ttk.Frame):
     def get(self):
         return self.path
 
-
 class ScrollableFrame(ttk.Frame):
     """A vertically-scrollable frame; put widgets inside `.body`."""
 
@@ -359,10 +341,10 @@ class ScrollableFrame(ttk.Frame):
         canvas.pack(side="left", fill="both", expand=True)
         vscroll.pack(side="right", fill="y")
 
-        # Mouse wheel support — bind/unbind only while the cursor is over
-        # this canvas. A permanent bind_all() here would hijack mouse-wheel
-        # scrolling everywhere else in the app (e.g. it silently broke
-        # scrolling in the Fuzzy Matching preview table on the other tab).
+        
+        
+        
+        
         def _on_mousewheel(event):
             canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
@@ -374,7 +356,6 @@ class ScrollableFrame(ttk.Frame):
 
         canvas.bind("<Enter>", _bind_wheel)
         canvas.bind("<Leave>", _unbind_wheel)
-
 
 class StatCard(ttk.Frame):
     """A small colored summary card showing a number + label (used for stats rows)."""
@@ -390,13 +371,11 @@ class StatCard(ttk.Frame):
     def set(self, value):
         self.value_var.set(str(value))
 
-
 class Section(ttk.LabelFrame):
     """A titled section container with consistent padding."""
 
     def __init__(self, parent, title, **kwargs):
         super().__init__(parent, text=title, padding=12, **kwargs)
-
 
 def make_treeview(parent, columns, height=8):
     """Create a Treeview + scrollbars for previewing tabular data."""
@@ -415,7 +394,6 @@ def make_treeview(parent, columns, height=8):
     frame.grid_columnconfigure(0, weight=1)
     return frame, tree
 
-
 def rebuild_treeview_columns(tree, columns):
     """Reset a Treeview's columns entirely (used when the preview schema changes)."""
     tree.delete(*tree.get_children())
@@ -423,7 +401,6 @@ def rebuild_treeview_columns(tree, columns):
     for c in columns:
         tree.heading(c, text=c)
         tree.column(c, width=130, anchor="w")
-
 
 def fill_treeview(tree, df, max_rows=200):
     tree.delete(*tree.get_children())

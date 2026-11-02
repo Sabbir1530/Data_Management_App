@@ -9,12 +9,12 @@ from typing import Callable, Dict, List, Optional, Tuple, Any
 
 from shared.services.dict import HEALTHCARE_SYNONYMS
 
-try:  # fast path
+try:  
     from rapidfuzz import fuzz
 
     def _ratio(a: str, b: str) -> float:
         return float(fuzz.token_sort_ratio(a, b))
-except ImportError:  # fallback
+except ImportError:  
     from difflib import SequenceMatcher
 
     def _ratio(a: str, b: str) -> float:
@@ -25,7 +25,6 @@ except ImportError:  # fallback
 NULL_TOKENS = {"", "NULL", "NA", "N/A", "NAN", "NONE"}
 
 
-# ----------------------------------------------------------------- normalizing
 def to_str(v) -> str:
     if v is None:
         return ""
@@ -36,17 +35,13 @@ def to_str(v) -> str:
             return str(int(v))
     return str(v).strip()
 
-
 def display(v) -> str:
     return to_str(v)
-
 
 def null_if_token(s: str) -> str:
     return "" if s.strip().upper() in NULL_TOKENS else s.strip()
 
-
 _NON_ALNUM = re.compile(r"[^A-Z0-9]+")
-
 
 def norm_text(s: str) -> str:
     """Upper-case, strip punctuation, apply healthcare synonym dictionary."""
@@ -56,23 +51,20 @@ def norm_text(s: str) -> str:
         mapped.extend(HEALTHCARE_SYNONYMS.get(tok, tok).split())
     return " ".join(mapped) if mapped else " ".join(base)
 
-
 def norm_plain(s: str) -> str:
     return " ".join(_NON_ALNUM.sub(" ", s.upper()).split())
-
 
 def norm_zip(s: str) -> str:
     d = re.sub(r"\D", "", s)
     if not d:
         return ""
     if len(d) <= 5:
-        return d.zfill(5)          # Excel dropped leading zero: 8110 -> 08110
+        return d.zfill(5)          
     if len(d) == 8:
-        return d.zfill(9)[:5]      # ZIP+4 with lost zero
+        return d.zfill(9)[:5]      
     return d[:5]
 
 
-# ----------------------------------------------------------------- records
 @dataclass
 class Rec:
     idx: int
@@ -101,7 +93,6 @@ class Rec:
         self.n_zip = norm_zip(self.zip)
         return self
 
-
 def build_records(df, m: Dict[str, str]) -> List[Rec]:
     n = len(df)
 
@@ -128,7 +119,6 @@ def build_records(df, m: Dict[str, str]) -> List[Rec]:
         for i in range(n)
     ]
 
-
 def group_by_case(recs: List[Rec]) -> Dict[str, List[Rec]]:
     d: Dict[str, List[Rec]] = {}
     for r in recs:
@@ -137,7 +127,6 @@ def group_by_case(recs: List[Rec]) -> Dict[str, List[Rec]]:
     return {k: v for k, v in d.items() if len(v) > 1}
 
 
-# ----------------------------------------------------------------- pairs
 @dataclass
 class PairResult:
     i: int
@@ -145,10 +134,9 @@ class PairResult:
     name_score: float
     addr_score: float
     fuzzy_same: bool
-    ai_result: Optional[str] = None      # SAME / DIFFERENT / ERROR
+    ai_result: Optional[str] = None      
     ai_conf: int = 0
     ai_reason: str = ""
-
 
 def fuzzy_pair(a: Rec, b: Rec, thr: float) -> Tuple[float, float, bool]:
     ns = _ratio(a.n_name, b.n_name) if a.n_name and b.n_name else 0.0
@@ -159,7 +147,6 @@ def fuzzy_pair(a: Rec, b: Rec, thr: float) -> Tuple[float, float, bool]:
     )
     return ns, ads, same
 
-
 def run_fuzzy(recs: List[Rec], thr: float, progress: Optional[Callable[[float], None]] = None):
     cases = group_by_case(recs)
     pairs: Dict[Tuple[int, int], PairResult] = {}
@@ -168,8 +155,8 @@ def run_fuzzy(recs: List[Rec], thr: float, progress: Optional[Callable[[float], 
         if len(members) < 2:
             continue
         
-        # Sort members by rank (lowest rank first). 
-        # Tie break with idx to ensure deterministic selection.
+        
+        
         members_sorted = sorted(members, key=lambda x: (x.rank, x.idx))
         ref = members_sorted[0]
         
@@ -182,7 +169,6 @@ def run_fuzzy(recs: List[Rec], thr: float, progress: Optional[Callable[[float], 
             progress((k + 1) / total)
     if progress: progress(1.0)
     return pairs
-
 
 class UF:
     def __init__(self):
@@ -200,7 +186,6 @@ class UF:
         if ra != rb:
             self.p[rb] = ra
 
-
 def ai_candidates(pairs: Dict[Tuple[int, int], PairResult]) -> List[PairResult]:
     """Pairs fuzzy could not confirm (and not already linked through a fuzzy chain)."""
     uf = UF()
@@ -212,12 +197,10 @@ def ai_candidates(pairs: Dict[Tuple[int, int], PairResult]) -> List[PairResult]:
         if not p.fuzzy_same and p.ai_result in (None, "ERROR") and uf.find(p.i) != uf.find(p.j)
     ]
 
-
 def pair_key(a: Rec, b: Rec) -> str:
     ta = "|".join((a.name, a.addr, a.city, a.state))
     tb = "|".join((b.name, b.addr, b.city, b.state))
     return hashlib.sha1("||".join(sorted([ta.lower(), tb.lower()])).encode("utf-8")).hexdigest()[:20]
-
 
 def build_groups(pairs, ai_min_conf: int):
     """Union-find over SAME pairs. Returns (groups[list of row idx], labels{row idx: 'SAME-FUZZY'|'SAME-AI'})."""
@@ -235,7 +218,6 @@ def build_groups(pairs, ai_min_conf: int):
     for x in list(uf.p):
         groups.setdefault(uf.find(x), []).append(x)
     return [sorted(g) for g in groups.values() if len(g) > 1], labels
-
 
 def split_weak_groups(pairs: Dict[Tuple[int, int], PairResult], groups: List[List[int]], recs: List[Rec], ai_min_conf: int) -> Tuple[List[List[int]], List[str], List[int]]:
     """Splits weakly connected groups based on bridges and cut vertices."""
@@ -406,13 +388,12 @@ def split_weak_groups(pairs: Dict[Tuple[int, int], PairResult], groups: List[Lis
             if len(sg) > 1:
                 new_groups.append(sorted(sg))
             elif len(sg) == 1:
-                # If a bridge edge split created a singleton, we mark it dropped too
+                
                 dropped_nodes.append(sg[0])
 
     return new_groups, logs, dropped_nodes
 
 
-# ----------------------------------------------------------------- picking
 def _fmt(x: float) -> str:
     return str(int(x)) if float(x).is_integer() else str(x)
 
@@ -424,7 +405,6 @@ def pick_group(members: List[Rec]) -> Tuple[Rec, Any]:
     return best, reasons
 
 
-# ----------------------------------------------------------------- SQL text
 def build_sql_text(old: str, new: str, usr: str) -> str:
     return (
         f"EXEC  [MDM].[spRemap_NAD_EU_XREF] @OLD_ID ={old},  @OLD_ID_TYP  ='EU' , "

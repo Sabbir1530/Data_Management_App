@@ -1,7 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional
 
-
 class EntityMatchDecision(BaseModel):
     result: str = Field(description="Must be strictly one of: 'SAME', 'AFFILIATED', or 'DIFFERENT'.")
     reason: str = Field(

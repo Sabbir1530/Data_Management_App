@@ -28,7 +28,6 @@ from fuzzy_app.logic.config import load_api_key, env_file_status, ENV_PATH, AI_M
 NONE_OPTION = ""
 ID_COL = "Unique_ID"
 
-
 class FileMapping(ttk.Frame):
     """Column-mapping widget block for one source file."""
 
@@ -118,13 +117,12 @@ class FileMapping(ttk.Frame):
     def set_missing_note(self, text):
         self.missing_var.set(text)
 
-
 class GpoMatchTab(ttk.Frame):
     def __init__(self, parent):
         super().__init__(parent, padding=0)
 
-        self.df1 = None  # File 1 (internal / UPD)
-        self.df2 = None  # File 2 (GPO / company reference)
+        self.df1 = None  
+        self.df2 = None  
         self.path1 = None
         self.path2 = None
         self.hsp_df = None
@@ -140,11 +138,11 @@ class GpoMatchTab(ttk.Frame):
         self.body = scroller.body
         self._build_ui()
 
-    # ------------------------------------------------------------------
+    
     def _build_ui(self):
         pad = dict(padx=16, pady=8)
 
-        # === Step 1: Load files & map columns =============================
+        
         sec1 = Section(self.body, "Step 1 — Load Files & Map Columns")
         sec1.pack(fill="x", **pad)
 
@@ -169,7 +167,7 @@ class GpoMatchTab(ttk.Frame):
         ttk.Label(out_row, textvariable=self.out_dir_var, foreground="#555", width=40, anchor="w").pack(side="left", padx=6)
         ttk.Button(out_row, text="Choose...", command=self._choose_output_dir).pack(side="left")
 
-        # === Step 2: Geocode ================================================
+        
         sec2 = Section(self.body, "Step 2 — Fill Missing Coordinates")
         sec2.pack(fill="x", **pad)
         g_row = ttk.Frame(sec2)
@@ -194,7 +192,7 @@ class GpoMatchTab(ttk.Frame):
             foreground="#b45309", wraplength=1000, justify="left",
         ).pack(anchor="w", pady=(4, 0))
 
-        # === Step 3: Split File 1 into HSP / NonHSP ========================
+        
         sec3 = Section(self.body, "Step 3 — Split File 1 into HSP / Non-HSP")
         sec3.pack(fill="x", **pad)
         split_row = ttk.Frame(sec3)
@@ -208,7 +206,7 @@ class GpoMatchTab(ttk.Frame):
         self.split_status_var = tk.StringVar(value="")
         ttk.Label(sec3, textvariable=self.split_status_var, foreground="#555").pack(anchor="w", pady=(6, 0))
 
-        # === Step 4: Distance matching ======================================
+        
         sec4 = Section(self.body, "Step 4 — Distance Matching")
         sec4.pack(fill="x", **pad)
         thresh_row = ttk.Frame(sec4)
@@ -244,7 +242,7 @@ class GpoMatchTab(ttk.Frame):
         self.pairs_frame, self.pairs_tree = make_treeview(sec4, columns=("DISTANCE_M", "TIER"), height=6)
         self.pairs_frame.pack(fill="both", expand=True)
 
-        # === Step 5: AI Matching ============================================
+        
         sec5 = Section(self.body, "Step 5 — AI Matching (Gemini)")
         sec5.pack(fill="x", **pad)
 
@@ -307,9 +305,9 @@ class GpoMatchTab(ttk.Frame):
         self.open_ai_folder_btn = ttk.Button(ai_open_row, text="Open Output Folder", command=self._open_ai_folder, state="disabled")
         self.open_ai_folder_btn.pack(side="left")
 
-    # ------------------------------------------------------------------
-    # Step 1 handlers
-    # ------------------------------------------------------------------
+    
+    
+    
     def _on_file1_loaded(self, path):
         try:
             if path.lower().endswith('.csv'):
@@ -395,9 +393,9 @@ class GpoMatchTab(ttk.Frame):
         if self.df1 is not None:
             self.split_btn.config(state="normal")
 
-    # ------------------------------------------------------------------
-    # Step 2: Geocoding
-    # ------------------------------------------------------------------
+    
+    
+    
     def _geocode(self, which):
         df = self.df1 if which == 1 else self.df2
         mapping_widget = self.map1 if which == 1 else self.map2
@@ -458,8 +456,8 @@ class GpoMatchTab(ttk.Frame):
         self.geo_status_var.set(f"File {which}: filled {filled} of {total_missing} missing coordinates.")
         self._refresh_missing_note(which)
 
-        # Auto-save a copy with the filled coordinates so the user can
-        # verify them — this never touches the original uploaded file.
+        
+        
         saved_path = self._export_geocoded(which, silent=True)
 
         msg = f"File {which}: filled {filled} of {total_missing} rows."
@@ -496,9 +494,9 @@ class GpoMatchTab(ttk.Frame):
             show_info("Exported", f"Saved to:\n{path}")
         return path
 
-    # ------------------------------------------------------------------
-    # Step 3: Split
-    # ------------------------------------------------------------------
+    
+    
+    
     def _run_split(self):
         if self.df1 is None:
             return
@@ -518,9 +516,9 @@ class GpoMatchTab(ttk.Frame):
         )
         self.dist_btn.config(state="normal")
 
-    # ------------------------------------------------------------------
-    # Step 4: Distance matching
-    # ------------------------------------------------------------------
+    
+    
+    
     def _run_distance(self):
         if self.hsp_df is None or self.nonhsp_df is None or self.df2 is None:
             show_error("Not ready", "Complete Step 1-3 first.")
@@ -578,8 +576,8 @@ class GpoMatchTab(ttk.Frame):
             self.stat_total_pairs.set(0)
             return
 
-        # Add a stable Unique_ID primary key right after pairing — this is
-        # what the AI step keys its cache on, so Stop/Resume works correctly.
+        
+        
         combined = combined.reset_index(drop=True)
         combined.insert(0, ID_COL, [f"P{n:06d}" for n in range(1, len(combined) + 1)])
         self.paired_df = combined
@@ -614,9 +612,9 @@ class GpoMatchTab(ttk.Frame):
             return
         show_info("Exported", f"Saved to:\n{path}")
 
-    # ------------------------------------------------------------------
-    # Step 5: AI matching
-    # ------------------------------------------------------------------
+    
+    
+    
     def _populate_ai_mapping(self, combined):
         cols = list(combined.columns)
         m1 = self.map1.get_mapping()

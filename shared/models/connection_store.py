@@ -10,7 +10,6 @@ from shared.models.connection import ConnectionSettings
 
 DEFAULT_STORE_NAME = "mdm_connection.json"
 
-
 def _store_path() -> Path:
     env = os.environ.get("MDM_CONN_FILE")
     if env:
@@ -20,7 +19,6 @@ def _store_path() -> Path:
         return connection_file_path()
     except Exception:
         return Path.cwd() / DEFAULT_STORE_NAME
-
 
 def load_saved_connection() -> Optional[ConnectionSettings]:
     path = _store_path()
@@ -44,7 +42,6 @@ def load_saved_connection() -> Optional[ConnectionSettings]:
     except Exception:
         return None
 
-
 def save_connection(settings: ConnectionSettings) -> Path:
     path = _store_path()
     payload = {
@@ -59,7 +56,6 @@ def save_connection(settings: ConnectionSettings) -> Path:
     }
     path.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     return path
-
 
 def clear_saved_connection() -> None:
     path = _store_path()

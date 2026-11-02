@@ -3,10 +3,8 @@ from __future__ import annotations
 
 from sqlalchemy import text
 
-
 def _id(v: str):
     return int(v) if v.isdigit() else v
-
 
 def run_remap(engine, old: str, new: str, usr: str) -> None:
     with engine.begin() as conn:

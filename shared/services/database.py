@@ -4,7 +4,6 @@ from sqlalchemy.engine import URL
 
 from shared.models.connection import ConnectionSettings
 
-
 def get_available_odbc_driver():
     driver_names = [
         "ODBC Driver 17 for SQL Server",
@@ -17,7 +16,6 @@ def get_available_odbc_driver():
         if driver in available_drivers:
             return driver
     raise RuntimeError(f"No ODBC SQL Server driver found. Available: {available_drivers}")
-
 
 def build_connection_url(connection_settings, database_name):
     selected_database = database_name or connection_settings.database or "master"
@@ -39,13 +37,11 @@ def build_connection_url(connection_settings, database_name):
         query=query,
     )
 
-
 def create_database_engine(connection_settings, database_name=None):
     return create_engine(
         build_connection_url(connection_settings, database_name),
         pool_pre_ping=True,
     )
-
 
 def list_accessible_databases(connection_settings):
     """List user databases via SQLAlchemy only (no pandas — avoids version quirks)."""

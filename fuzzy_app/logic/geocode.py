@@ -9,7 +9,6 @@ import pandas as pd
 from geopy.geocoders import ArcGIS
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 
-
 def build_address(row, street_col, city_col, state_col, addr2_col=None, zip_col=None):
     addr1 = str(row[street_col]).strip() if pd.notna(row.get(street_col)) else ""
 
@@ -32,7 +31,6 @@ def build_address(row, street_col, city_col, state_col, addr2_col=None, zip_col=
     parts = [p for p in [street, city, state, zip_code] if p]
     return ", ".join(parts)
 
-
 def _invalid_coord_mask(series):
     """True where a coordinate cell is genuinely unusable: empty/NaN, or
     text that isn't a real number. Coercing through pd.to_numeric catches
@@ -40,12 +38,10 @@ def _invalid_coord_mask(series):
     flagging perfectly valid numeric cells as missing."""
     return pd.to_numeric(series, errors="coerce").isna()
 
-
 def count_missing(df, lat_col, lon_col):
     if lat_col not in df.columns or lon_col not in df.columns:
         return len(df)
     return int((_invalid_coord_mask(df[lat_col]) | _invalid_coord_mask(df[lon_col])).sum())
-
 
 def _geocode_addresses(unique_addrs, stop_flag=None, delay_seconds=1.0, max_retries=3, progress_cb=None):
     """Shared retry/backoff geocoding core. Returns {address: (lat, lon)|
@@ -67,9 +63,9 @@ def _geocode_addresses(unique_addrs, stop_flag=None, delay_seconds=1.0, max_retr
                 break
             except (GeocoderTimedOut, GeocoderServiceError):
                 if attempt < max_retries - 1:
-                    time.sleep(delay_seconds * (attempt + 1) * 2)  # backoff before retrying
+                    time.sleep(delay_seconds * (attempt + 1) * 2)  
             except Exception:
-                break  # non-retryable error for this address
+                break  
 
         cache[addr] = result
         if result == (None, None):
@@ -80,7 +76,6 @@ def _geocode_addresses(unique_addrs, stop_flag=None, delay_seconds=1.0, max_retr
         time.sleep(delay_seconds)
 
     return cache, failed_addrs
-
 
 def geocode_missing(
     df,
@@ -142,7 +137,6 @@ def geocode_missing(
             filled += 1
 
     return df, filled, total_missing, failed_addrs
-
 
 def geocode_missing_by_address(
     df,

@@ -22,11 +22,9 @@ NAME2_CANDIDATES = ["ENDUSER_NAME", "CMPNY_NM", "ENTITY2_NAME"]
 ADDR1_CANDIDATES = ["MMBR_ADDR_1", "EU_ADDR", "ENTITY1_ADDR"]
 ADDR2_CANDIDATES = ["ENDUSER_ADDR_1", "CMPNY_ADDR_1", "ENTITY2_ADDR"]
 
-# Name/Address weighting is fixed (no longer exposed in the UI) — the
-# acceptance threshold applies to the resulting average score.
+
 NAME_WEIGHT = 70
 ADDR_WEIGHT = 30
-
 
 class FuzzyMatchTab(ttk.Frame):
     def __init__(self, parent):
@@ -43,26 +41,26 @@ class FuzzyMatchTab(ttk.Frame):
 
         self._build_ui()
 
-    # ------------------------------------------------------------------
+    
     def _build_ui(self):
-        # --- File input section -----------------------------------------
+        
         sec_file = Section(self.body, "1. Input File")
         sec_file.pack(fill="x", padx=16, pady=(16, 10))
         self.file_picker = FilePicker(sec_file, "Data file:", on_pick=self._on_file_loaded)
         self.file_picker.pack(fill="x")
 
-        # --- Column mapping section ---------------------------------------
+        
         sec_cols = Section(self.body, "2. Column Mapping (auto-detected — change if needed)")
         sec_cols.pack(fill="x", padx=16, pady=(0, 10))
 
-        # NOTE: this row is its own frame (packed on its own line, fill="x")
-        # so it behaves as a single side="top" block. Packing `left`/`right`
-        # directly into sec_cols with side="left" would claim the *full
-        # height* of sec_cols for their column, which pushes every later
-        # side="top" sibling (the distance checkbox, coordinate mapping,
-        # geocode buttons) into the leftover sliver to the right instead of
-        # a new row underneath — that was the "everything crammed on the
-        # right" layout bug.
+        
+        
+        
+        
+        
+        
+        
+        
         mapping_row = ttk.Frame(sec_cols)
         mapping_row.pack(fill="x")
 
@@ -95,10 +93,10 @@ class FuzzyMatchTab(ttk.Frame):
         self.zip2_combo = LabeledCombo(right, "Zip column (optional):", editable=True)
         self.zip2_combo.pack(anchor="w", pady=2)
 
-        # --- Optional distance (Lat/Lon) mapping ---------------------------
-        # This whole block is its own side="top" row too, so it always
-        # renders as a new full-width section BELOW the name/address
-        # mapping above — never squeezed beside it.
+        
+        
+        
+        
         self.use_distance_var = tk.BooleanVar(value=False)
         dist_toggle_row = ttk.Frame(sec_cols)
         dist_toggle_row.pack(fill="x", pady=(10, 0))
@@ -108,7 +106,7 @@ class FuzzyMatchTab(ttk.Frame):
         ).pack(anchor="w")
 
         self.distance_frame = ttk.Frame(sec_cols)
-        # not packed by default — shown only when the checkbox above is ticked
+        
 
         ttk.Label(self.distance_frame, text="Entity 1 coordinates", font=("Segoe UI", 9, "bold")).pack(anchor="w", pady=(8, 0))
         e1_row = ttk.Frame(self.distance_frame)
@@ -163,7 +161,7 @@ class FuzzyMatchTab(ttk.Frame):
             foreground="#555", wraplength=1000, justify="left",
         ).pack(anchor="w", pady=(6, 0))
 
-        # --- Suggestion mapping -------------------------------------------
+        
         self.use_suggestion_var = tk.BooleanVar(value=False)
         sugg_toggle_row = ttk.Frame(sec_cols)
         sugg_toggle_row.pack(fill="x", pady=(10, 0))
@@ -178,7 +176,7 @@ class FuzzyMatchTab(ttk.Frame):
         self.suggestion_combo = LabeledCombo(sugg_row, "Group by ID column (e.g. EndUser ID):", editable=True)
         self.suggestion_combo.pack(side="left")
 
-        # --- Settings section -----------------------------------------
+        
         sec_settings = Section(self.body, "3. Matching Settings")
         sec_settings.pack(fill="x", padx=16, pady=(0, 10))
         row1 = ttk.Frame(sec_settings)
@@ -199,7 +197,7 @@ class FuzzyMatchTab(ttk.Frame):
         )
         self.priority_entry.pack(side="left")
 
-        # --- Output + run section -----------------------------------------
+        
         sec_run = Section(self.body, "4. Output & Run")
         sec_run.pack(fill="x", padx=16, pady=(0, 10))
         out_row = ttk.Frame(sec_run)
@@ -218,7 +216,7 @@ class FuzzyMatchTab(ttk.Frame):
         self.status_var = tk.StringVar(value="Idle")
         ttk.Label(run_row, textvariable=self.status_var, foreground="#555").pack(side="left")
 
-        # --- Results section -----------------------------------------
+        
         sec_results = Section(self.body, "5. Summary & Preview")
         sec_results.pack(fill="both", expand=True, padx=16, pady=(0, 16))
 
@@ -249,7 +247,7 @@ class FuzzyMatchTab(ttk.Frame):
         )
         self.preview_frame.pack(fill="both", expand=True)
 
-    # ------------------------------------------------------------------
+    
     def _on_file_loaded(self, path):
         try:
             if path.lower().endswith('.csv'):
@@ -277,17 +275,17 @@ class FuzzyMatchTab(ttk.Frame):
         self.state2_combo.set_values(opt_cols, default=guess_column(opt_cols, ["ENDUSER_ST", "CMPNY_ST", "STATE2", "STATE"], ["enduser", "cmpny", "company", "st", "state"], fallback="", required=False, reverse=True))
         self.zip2_combo.set_values(opt_cols, default=guess_column(opt_cols, ["ENDUSER_ZIP", "CMPNY_ZIP", "ZIP2", "ZIP"], ["enduser", "cmpny", "company", "zip"], fallback="", required=False, reverse=True))
 
-        # Auto-detect Entity 1/2 Lat/Lon columns if this same file already
-        # has them (populated whether or not the distance checkbox is on,
-        # so they're ready the moment the user ticks it). Left blank (not
-        # defaulted to an unrelated column) when nothing matches — these
-        # are optional, so guessing wrong would be actively misleading.
-        #
-        # Both entities live in the SAME file/column list here (unlike the
-        # GPO tab, which has two separate files), so a naive "find the
-        # first column containing 'lat'" would hand Entity 1 *and* Entity 2
-        # the exact same column. `used` is tracked across all four guesses
-        # so each pick is a distinct column.
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         used = set()
 
         def _pick(tokens):
@@ -341,7 +339,7 @@ class FuzzyMatchTab(ttk.Frame):
             if "Longitude" not in self.df.columns:
                 self.df["Longitude"] = None
             
-            # Refresh UI combos with new columns
+            
             self._update_column_mappings(list(self.df.columns))
 
     def _refresh_missing_note(self, which):
@@ -484,7 +482,7 @@ class FuzzyMatchTab(ttk.Frame):
                            "columns (or use 'Geocode Missing Coordinates' first).")
                 return
 
-        # Concatenate address components into full strings for better fuzzy matching
+        
         df_run = self.df.copy()
         
         def _build_full_address(row, addr_col, city_col, state_col, zip_col):
@@ -531,7 +529,7 @@ class FuzzyMatchTab(ttk.Frame):
                     suggestion_group_col=suggestion_col,
                 )
                 
-                # We drop the temporary full address columns before returning
+                
                 for df_to_clean in (matches, diffs):
                     df_to_clean.drop(columns=[full_addr1_col, full_addr2_col], inplace=True, errors="ignore")
 
@@ -571,10 +569,10 @@ class FuzzyMatchTab(ttk.Frame):
         self.stat_suggested.set(stats["suggested"])
         self.stat_rate.set(f"{stats['match_rate']}%")
 
-        # Preview only the "Suggested" rows, showing just the essentials:
-        # Entity 1 name/address, Entity 2 name/address, average score, suggestion.
-        # Wrapped defensively so a preview hiccup can never block the rest
-        # of this handler (buttons/status/dialog) from completing.
+        
+        
+        
+        
         try:
             name1, addr1, name2, addr2 = self._cols_used
             preview_cols = []

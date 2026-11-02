@@ -19,7 +19,7 @@ try:
     from google import genai
     from google.genai import types
     from google.genai.errors import APIError
-except ImportError as _e:  # pragma: no cover
+except ImportError as _e:  
     genai = types = None
     APIError = Exception
     _import_error = _e
@@ -41,23 +41,19 @@ SYSTEM = (
     "Use your healthcare-industry knowledge. Return confidence 0-100 and a 1-2 line reason."
 )
 
-
 class AISameUnavailable(RuntimeError):
     pass
-
 
 class SameDecision(BaseModel):
     result: str = Field(description="Strictly 'SAME' or 'DIFFERENT'.")
     reason: str = Field(description="1-2 lines of evidence.")
     confidence: int = Field(description="0-100")
 
-
 def ensure_available() -> None:
     if _import_error is not None:
         raise AISameUnavailable(f"google-genai / pydantic / python-dotenv missing: {_import_error}")
     if not (os.getenv("GEMINI_API_KEY") or "").strip():
         raise AISameUnavailable("GEMINI_API_KEY is missing (environment or .env file).")
-
 
 async def _call(client, sem, it: dict) -> dict:
     prompt = (
@@ -91,7 +87,6 @@ async def _call(client, sem, it: dict) -> dict:
                 await asyncio.sleep(1)
     return {"result": "ERROR", "confidence": 0, "reason": "API/parse failure after retries"}
 
-
 async def _run(items, log, progress, api_key, batch_size, conc, on_batch_done):
     key = (api_key or os.getenv("GEMINI_API_KEY") or "").strip()
     client = genai.Client(api_key=key)
@@ -112,7 +107,6 @@ async def _run(items, log, progress, api_key, batch_size, conc, on_batch_done):
                 log(f"Warning: checkpoint failed: {exc}")
     return out
 
-
 def classify_pairs(items: List[dict], log=None, progress=None, api_key: Optional[str] = None,
                    batch_size: int = BATCH_SIZE, max_concurrency: int = MAX_CONCURRENT,
                    on_batch_done: Optional[Callable[[Dict[str, dict]], None]] = None) -> Dict[str, dict]:
@@ -121,7 +115,6 @@ def classify_pairs(items: List[dict], log=None, progress=None, api_key: Optional
                             api_key, batch_size, max_concurrency, on_batch_done))
 
 
-# ---- checkpoint cache (only SAME / DIFFERENT are stored; ERROR gets retried next run)
 def load_cache(path: Path) -> Dict[str, dict]:
     if not path.is_file():
         return {}
@@ -131,7 +124,6 @@ def load_cache(path: Path) -> Dict[str, dict]:
                     for r in csv.DictReader(f) if r.get("key")}
     except Exception:
         return {}
-
 
 def append_cache(path: Path, results: Dict[str, dict]) -> None:
     rows = [(k, v["result"], v["confidence"], v["reason"]) for k, v in results.items()

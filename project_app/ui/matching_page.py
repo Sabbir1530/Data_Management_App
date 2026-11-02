@@ -38,7 +38,6 @@ from project_app.services.match_cache import (
     CACHE_COLUMNS,
 )
 
-# Fixed GPO Company IDs available in the dropdown (Task 2 / Auto-Match pause).
 GPO_COMPANY_IDS = [
     "70281985",
     "70278588",
@@ -47,7 +46,6 @@ GPO_COMPANY_IDS = [
     "70169788",
     "70280859",
 ]
-
 
 class DataMatchingPage(ttk.Frame):
     def __init__(self, master, connection_settings, shared_workspace_var=None, shared_schema_var=None):
@@ -93,7 +91,7 @@ class DataMatchingPage(ttk.Frame):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(3, weight=1)
 
-        # Header
+        
         header = ttk.Frame(self)
         header.grid(row=0, column=0, sticky="ew", pady=(0, 6))
         header.columnconfigure(1, weight=1)
@@ -110,7 +108,7 @@ class DataMatchingPage(ttk.Frame):
             foreground="gray",
         ).pack(side="left")
 
-        # Workspace selector
+        
         ws_container = ttk.LabelFrame(self, text=" Run Workspace Directory ", padding=8)
         ws_container.grid(row=1, column=0, sticky="ew", pady=(0, 6))
         ws_container.columnconfigure(0, weight=1)
@@ -129,7 +127,7 @@ class DataMatchingPage(ttk.Frame):
         self.ent_ws_dir.bind("<Return>", lambda e: self._on_workspace_input_changed())
         self.ent_ws_dir.bind("<FocusOut>", lambda e: self._on_workspace_input_changed())
 
-        # Config
+        
         cfg = ttk.LabelFrame(self, text=" 1. Database & Task ", padding=8)
         cfg.grid(row=2, column=0, sticky="ew", pady=(0, 6))
         for c in (1, 3, 5):
@@ -213,13 +211,13 @@ class DataMatchingPage(ttk.Frame):
         )
         self.btn_clear_cache.pack(side="left", padx=(6, 0))
 
-        # Cache Status Line
+        
         status_row = ttk.Frame(cfg)
         status_row.grid(row=4, column=0, columnspan=6, sticky="ew", pady=(4, 0))
         self.lbl_cache_info = ttk.Label(status_row, text="", foreground="#4B5563", font=("Arial", 8))
         self.lbl_cache_info.pack(side="left")
 
-        # Main split
+        
         split = ttk.Panedwindow(self, orient="vertical")
         split.grid(row=3, column=0, sticky="nsew")
 
@@ -913,7 +911,7 @@ class DataMatchingPage(ttk.Frame):
                 self.result_queue.put(("auto_match_done", (classified, "2")))
                 return
 
-            # Keep only the first best match for a given REC_ID
+            
             same_aff = self._prioritize_and_deduplicate(same_aff, score_col="confidence")
 
             matches = [
@@ -942,7 +940,6 @@ class DataMatchingPage(ttk.Frame):
             self.result_queue.put(("auto_match_error", e))
             return
 
-
         self._log(f"=== Auto-Apply Task 2 finished. Total committed: {committed_count}. ===")
 
         try:
@@ -955,7 +952,6 @@ class DataMatchingPage(ttk.Frame):
             self._log(f"Warning: could not auto-save final nad_ai_2.xlsx — {e}")
 
         self.result_queue.put(("auto_match_done", (classified, "2")))
-
 
     def _on_auto_match(self):
         if self.auto_match_running:
@@ -1161,7 +1157,7 @@ class DataMatchingPage(ttk.Frame):
 
         combined = pd.concat(all_frames, ignore_index=True, sort=False)
 
-        # Auto-save final result directly into active workspace output dir
+        
         try:
             final_path = final_results_path("4-7")
             final_path.parent.mkdir(parents=True, exist_ok=True)

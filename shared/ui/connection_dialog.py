@@ -7,7 +7,6 @@ from shared.models.connection import ConnectionSettings
 from shared.models.connection_store import clear_saved_connection, load_saved_connection, save_connection
 from shared.services.database import create_database_engine
 
-
 class ConnectionDialog(tk.Toplevel):
     """Modal connection form attached to the single app root. Does NOT call wait_window itself."""
 
@@ -30,7 +29,7 @@ class ConnectionDialog(tk.Toplevel):
         if self._saved:
             self._apply_settings(self._saved)
 
-        # Make sure the dialog is visible even if parent is withdrawn
+        
         self.attributes("-topmost", True)
         self.lift()
         self.focus_force()
@@ -40,7 +39,7 @@ class ConnectionDialog(tk.Toplevel):
         except tk.TclError:
             pass
 
-        # Center on screen
+        
         self.update_idletasks()
         w, h = self.winfo_width(), self.winfo_height()
         sw, sh = self.winfo_screenwidth(), self.winfo_screenheight()

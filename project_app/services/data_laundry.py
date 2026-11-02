@@ -19,7 +19,6 @@ CANADIAN_PROVINCES = {
 
 LogFn = Callable[[str], None]
 
-
 def verify_and_fix_city_state_zip(city, state, zip_code):
     clean_city = str(city).strip().upper() if pd.notna(city) else ""
     clean_state = str(state).strip().upper() if pd.notna(state) else ""
@@ -66,12 +65,11 @@ def verify_and_fix_city_state_zip(city, state, zip_code):
                 official_city = city_res[0].major_city.upper() if city_res[0].major_city else clean_city
                 return official_city, clean_state, fixed_zip
         except Exception:
-            # If uszipcode throws an exception (e.g. ValueError for an invalid city name),
-            # just swallow it and fall back to the original inputs
+            
+            
             pass
 
     return clean_city, clean_state, clean_zip_num
-
 
 def sanitize_identifier(identifier: str) -> str:
     if not identifier:
@@ -81,11 +79,9 @@ def sanitize_identifier(identifier: str) -> str:
         raise ValueError(f"Invalid character in database object: '{identifier}'")
     return cleaned
 
-
 def sql_table(db: str, schema: str, table: str) -> str:
     """Three-part name: [db].[schema].[table]  (matches place_holder_db.[place_holder_schema].[...])."""
     return f"[{sanitize_identifier(db)}].[{sanitize_identifier(schema)}].[{sanitize_identifier(table)}]"
-
 
 def build_pyodbc_conn_str(
     server: str,
@@ -119,7 +115,6 @@ def build_pyodbc_conn_str(
         f"UID={username};PWD={password};{extra}Network=DBMSSOCN;"
     )
 
-
 def _connect(
     server, database, username, password, auth_mode="sql",
     trust_server_certificate=True, encrypt=False,
@@ -131,13 +126,12 @@ def _connect(
     )
     conn = pyodbc.connect(conn_str, autocommit=True)
     cursor = conn.cursor()
-    # Avoid rowcount noise / multi-result issues from SPs
+    
     try:
         cursor.execute("SET NOCOUNT ON;")
     except Exception:
         pass
     return conn, cursor
-
 
 def _exec(cursor, sql: str, log: LogFn, label: str, params=None):
     log(f"  → {label}")
@@ -146,7 +140,7 @@ def _exec(cursor, sql: str, log: LogFn, label: str, params=None):
             cursor.execute(sql, params)
         else:
             cursor.execute(sql)
-        # Drain any extra result sets from stored procedures
+        
         while True:
             try:
                 if not cursor.nextset():
@@ -157,12 +151,10 @@ def _exec(cursor, sql: str, log: LogFn, label: str, params=None):
         log(f"  ✗ FAILED at [{label}]: {e}")
         raise
 
-
 def _scalar(cursor, sql: str) -> int:
     cursor.execute(sql)
     row = cursor.fetchone()
     return int(row[0]) if row and row[0] is not None else 0
-
 
 def run_preview(
     server: str,
@@ -190,7 +182,6 @@ def run_preview(
         return columns, rows
     finally:
         conn.close()
-
 
 def run_stage1(
     server: str,
@@ -221,7 +212,7 @@ def run_stage1(
         t_zip = sql_table(db, sch, "TEMP_ZIP")
         sp_zip = sql_table(db, sch, "spZIPCODE_LAUNDRY")
 
-        # ---- EXTRACT (script lines 1–15) ----
+        
         log("Step 1/4 — Truncate + extract source rows...")
         _exec(cursor, f"TRUNCATE TABLE {t_prcs};", log, "TRUNCATE TEMP_NAME_ADDR_PRCS")
 
@@ -237,7 +228,7 @@ def run_stage1(
         total_extracted = _scalar(cursor, f"SELECT COUNT(*) FROM {t_prcs}")
         log(f"  Extracted {total_extracted} rows into TEMP_NAME_ADDR_PRCS.")
 
-        # ---- ZIP / CITY / STATE (script lines 17–40) ----
+        
         log("Step 2/4 — ZIP / City / State laundry...")
         _exec(cursor, f"TRUNCATE TABLE {t_zip};", log, "TRUNCATE TEMP_ZIP")
         _exec(
@@ -269,7 +260,7 @@ def run_stage1(
             "UPDATE UPD_CITY/ST/ZIP from TEMP_ZIP",
         )
 
-        # ---- Invalid ZIP + 4-digit fix (script lines 42–62) ----
+        
         log("Step 3/4 — Validate ZIP against PDIDW_DEV.REF.ZIP_CODE...")
         _exec(
             cursor,
@@ -302,7 +293,7 @@ def run_stage1(
             "Fix 4-digit ZIPs via REF.ZIP_CODE",
         )
 
-        # ---- Unresolved for manual review (script lines 65–67) ----
+        
         log("Step 4/4 — Collect unresolved (Invalid ZIP / missing ZIP)...")
         cursor.execute(
             f"""
@@ -339,7 +330,6 @@ def run_stage1(
         if conn:
             conn.close()
 
-
 def run_stage2(
     server: str,
     database: str,
@@ -372,7 +362,7 @@ def run_stage2(
         sp_addr = sql_table(db, sch, "spADDR_LAUNDRY")
         sp_nm = sql_table(db, sch, "spNM_LAUNDRY")
 
-        # ---- Apply reviewed suggestions (manual fix section of script) ----
+        
         log("Step 1/3 — Commit reviewed ZIP / city / state corrections...")
         applied = 0
         for r in manual_data:
@@ -402,7 +392,7 @@ def run_stage2(
             applied += 1
         log(f"  Applied corrections to {applied} reviewed rows.")
 
-        # ---- CLEAN ADDRESS (script lines 73–104) ----
+        
         log("Step 2/3 — Address laundry (spADDR_LAUNDRY)...")
         _exec(cursor, f"TRUNCATE TABLE {t_addr};", log, "TRUNCATE TEMP_ADDR")
         _exec(
@@ -423,7 +413,7 @@ def run_stage2(
         )
         _exec(cursor, f"EXEC {sp_addr} @Src = 'MNL';", log, "EXEC spADDR_LAUNDRY @Src='MNL'")
 
-        # JOIN to TEMP_ADDR_PARTS — exact match to script
+        
         _exec(
             cursor,
             f"""
@@ -446,7 +436,7 @@ def run_stage2(
             "UPDATE address parts from TEMP_ADDR_PARTS",
         )
 
-        # Highway / state-prefix addresses — match cleaning_temp.sql literally
+        
         _exec(
             cursor,
             f"""
@@ -464,7 +454,7 @@ def run_stage2(
             "UPDATE highway/state-prefix addresses",
         )
 
-        # ---- CLEAN NAME (script lines 106–128) ----
+        
         log("Step 3/3 — Name laundry (spNM_LAUNDRY)...")
         _exec(cursor, f"TRUNCATE TABLE {t_nm};", log, "TRUNCATE TEMP_NM")
         _exec(
@@ -505,7 +495,6 @@ def run_stage2(
     finally:
         if conn:
             conn.close()
-
 
 def is_column_empty(
     server: str,

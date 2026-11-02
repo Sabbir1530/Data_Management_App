@@ -4,7 +4,6 @@ Splits a dataframe into two groups (keyword-present / keyword-absent) in a
 target column. Adapted from the user's original spliter.py.
 """
 
-
 def split_by_keyword(df, target_column, keyword="Hospital"):
     """Returns (df_with_keyword, df_without_keyword)."""
     if target_column not in df.columns:

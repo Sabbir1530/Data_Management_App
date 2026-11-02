@@ -1,9 +1,9 @@
 HEALTHCARE_SYNONYMS = {
-    # ============================================================
-    # SPECIALTIES / DEPARTMENTS
-    # ============================================================
+    
+    
+    
 
-    # Pediatrics
+    
     "PEDS": "PEDIATRIC",
     "PED": "PEDIATRIC",
     "PEDIATRICS": "PEDIATRIC",
@@ -17,14 +17,14 @@ HEALTHCARE_SYNONYMS = {
     "CHILDREN'S": "PEDIATRIC",
     "CHILDREN’S": "PEDIATRIC",
 
-    # Orthopedics
+    
     "ORTHO": "ORTHOPEDIC",
     "ORTHOPEDICS": "ORTHOPEDIC",
     "ORTHOPAEDICS": "ORTHOPEDIC",
     "ORTHOPAEDIC": "ORTHOPEDIC",
     "ORTHOPEADIC": "ORTHOPEDIC",
 
-    # Cardiology
+    
     "CARDIO": "CARDIOLOGY",
     "CARDIAC": "CARDIOLOGY",
     "CARDIOLOGY": "CARDIOLOGY",
@@ -33,20 +33,20 @@ HEALTHCARE_SYNONYMS = {
     "CVS": "CARDIOVASCULAR",
     "CARDIOVASCULAR": "CARDIOVASCULAR",
 
-    # Neurology
+    
     "NEURO": "NEUROLOGY",
     "NEUROLOGY": "NEUROLOGY",
     "NEUROLOGICAL": "NEUROLOGY",
     "NEUROSCIENCE": "NEUROSCIENCE",
     "NEUROSCIENCES": "NEUROSCIENCE",
 
-    # Neurosurgery
+    
     "NS": "NEUROSURGERY",
     "NEUROSURG": "NEUROSURGERY",
     "NEUROSURGICAL": "NEUROSURGERY",
     "NEUROSURGERY": "NEUROSURGERY",
 
-    # Obstetrics / Gynecology
+    
     "OB": "OBSTETRICS",
     "OBS": "OBSTETRICS",
     "OBSTETRIC": "OBSTETRICS",
@@ -59,26 +59,26 @@ HEALTHCARE_SYNONYMS = {
     "OB/GYN": "OBSTETRICS GYNECOLOGY",
     "OB-GYN": "OBSTETRICS GYNECOLOGY",
 
-    # Oncology
+    
     "ONC": "ONCOLOGY",
     "ONCO": "ONCOLOGY",
     "ONCOLOGY": "ONCOLOGY",
     "CANCER": "ONCOLOGY",
     "CANCER CENTER": "ONCOLOGY",
 
-    # Hematology
+    
     "HEME": "HEMATOLOGY",
     "HEM": "HEMATOLOGY",
     "HEMATOLOGY": "HEMATOLOGY",
 
-    # Hematology / Oncology
+    
     "HEME ONC": "HEMATOLOGY ONCOLOGY",
     "HEM ONC": "HEMATOLOGY ONCOLOGY",
     "HEMATOLOGY ONCOLOGY": "HEMATOLOGY ONCOLOGY",
     "HEMATOLOGY/ONCOLOGY": "HEMATOLOGY ONCOLOGY",
     "HEMONC": "HEMATOLOGY ONCOLOGY",
 
-    # Surgery
+    
     "SURG": "SURGICAL",
     "SURGICAL": "SURGICAL",
     "SURGERY": "SURGICAL",
@@ -86,25 +86,25 @@ HEALTHCARE_SYNONYMS = {
     "GEN SURG": "GENERAL SURGERY",
     "GENSURG": "GENERAL SURGERY",
 
-    # Internal Medicine
+    
     "IM": "INTERNAL MEDICINE",
     "INT MED": "INTERNAL MEDICINE",
     "INTERNAL MED": "INTERNAL MEDICINE",
     "INTERNAL MEDICINE": "INTERNAL MEDICINE",
 
-    # Family Medicine
+    
     "FM": "FAMILY MEDICINE",
     "FAM MED": "FAMILY MEDICINE",
     "FAMILY MED": "FAMILY MEDICINE",
     "FAMILY MEDICINE": "FAMILY MEDICINE",
     "FAMILY PRACTICE": "FAMILY MEDICINE",
 
-    # Primary Care
+    
     "PCP": "PRIMARY CARE",
     "PRIMARY CARE": "PRIMARY CARE",
     "PRIMARY CARE MEDICINE": "PRIMARY CARE",
 
-    # Emergency Medicine
+    
     "ER": "EMERGENCY",
     "ED": "EMERGENCY",
     "EMERG": "EMERGENCY",
@@ -113,7 +113,7 @@ HEALTHCARE_SYNONYMS = {
     "EMERGENCY MED": "EMERGENCY MEDICINE",
     "EMERGENCY MEDICINE": "EMERGENCY MEDICINE",
 
-    # Critical Care
+    
     "ICU": "INTENSIVE CARE",
     "MICU": "MEDICAL INTENSIVE CARE",
     "SICU": "SURGICAL INTENSIVE CARE",
@@ -121,40 +121,40 @@ HEALTHCARE_SYNONYMS = {
     "CRITICAL CARE": "CRITICAL CARE",
     "INTENSIVE CARE": "INTENSIVE CARE",
 
-    # Pulmonology
+    
     "PULM": "PULMONOLOGY",
     "PULMONARY": "PULMONOLOGY",
     "PULMONOLOGY": "PULMONOLOGY",
     "RESP": "RESPIRATORY",
 
-    # Gastroenterology
+    
     "GI": "GASTROENTEROLOGY",
     "GASTRO": "GASTROENTEROLOGY",
     "GASTROENTEROLOGY": "GASTROENTEROLOGY",
 
-    # Nephrology
+    
     "NEPH": "NEPHROLOGY",
     "NEPHRO": "NEPHROLOGY",
     "NEPHROLOGY": "NEPHROLOGY",
     "RENAL": "NEPHROLOGY",
 
-    # Urology
+    
     "URO": "UROLOGY",
     "UROLOGY": "UROLOGY",
 
-    # Dermatology
+    
     "DERM": "DERMATOLOGY",
     "DERMATOLOGY": "DERMATOLOGY",
     "SKIN": "DERMATOLOGY",
 
-    # Ophthalmology
+    
     "OPHTH": "OPHTHALMOLOGY",
     "OPHTHAL": "OPHTHALMOLOGY",
     "OPHTHALMOLOGY": "OPHTHALMOLOGY",
     "EYE": "OPHTHALMOLOGY",
     "EYE CARE": "OPHTHALMOLOGY",
 
-    # ENT
+    
     "ENT": "OTOLARYNGOLOGY",
     "OTO": "OTOLARYNGOLOGY",
     "OTOLARYNGOLOGY": "OTOLARYNGOLOGY",
@@ -162,7 +162,7 @@ HEALTHCARE_SYNONYMS = {
     "EAR NOSE THROAT": "OTOLARYNGOLOGY",
     "EAR NOSE AND THROAT": "OTOLARYNGOLOGY",
 
-    # Psychiatry
+    
     "PSYCH": "PSYCHIATRY",
     "PSY": "PSYCHIATRY",
     "PSYCHIATRIC": "PSYCHIATRY",
@@ -171,88 +171,88 @@ HEALTHCARE_SYNONYMS = {
     "BEHAVIOURAL HEALTH": "BEHAVIORAL HEALTH",
     "MENTAL HEALTH": "BEHAVIORAL HEALTH",
 
-    # Psychology
+    
     "PSYCHOLOGY": "PSYCHOLOGY",
 
-    # Radiology
+    
     "RAD": "RADIOLOGY",
     "RADIOLOGY": "RADIOLOGY",
     "DIAGNOSTIC RADIOLOGY": "DIAGNOSTIC RADIOLOGY",
     "IMAGING": "IMAGING",
     "MEDICAL IMAGING": "IMAGING",
 
-    # Pathology
+    
     "PATH": "PATHOLOGY",
     "PATHOLOGY": "PATHOLOGY",
     "LAB PATH": "LABORATORY PATHOLOGY",
 
-    # Anesthesiology
+    
     "ANES": "ANESTHESIOLOGY",
     "ANESTH": "ANESTHESIOLOGY",
     "ANESTHESIA": "ANESTHESIOLOGY",
     "ANAESTHESIA": "ANESTHESIOLOGY",
     "ANESTHESIOLOGY": "ANESTHESIOLOGY",
 
-    # Rehabilitation
+    
     "REHAB": "REHABILITATION",
     "REHABILITATION": "REHABILITATION",
     "PM&R": "PHYSICAL MEDICINE REHABILITATION",
     "PMR": "PHYSICAL MEDICINE REHABILITATION",
     "PHYSIATRY": "PHYSICAL MEDICINE REHABILITATION",
 
-    # Physical Therapy
+    
     "PT": "PHYSICAL THERAPY",
     "PHYS THER": "PHYSICAL THERAPY",
     "PHYSICAL THERAPY": "PHYSICAL THERAPY",
 
-    # Occupational Therapy
+    
     "OT": "OCCUPATIONAL THERAPY",
     "OCC THER": "OCCUPATIONAL THERAPY",
     "OCCUPATIONAL THERAPY": "OCCUPATIONAL THERAPY",
 
-    # Speech Therapy
+    
     "ST": "SAINT",
     "SLP": "SPEECH LANGUAGE PATHOLOGY",
     "SPEECH THERAPY": "SPEECH THERAPY",
     "SPEECH LANGUAGE": "SPEECH LANGUAGE PATHOLOGY",
 
-    # Infectious Disease
+    
     "ID": "INFECTIOUS DISEASE",
     "INFECTIOUS DISEASE": "INFECTIOUS DISEASE",
     "INFECTIOUS DISEASES": "INFECTIOUS DISEASE",
 
-    # Endocrinology
+    
     "ENDO": "ENDOCRINOLOGY",
     "ENDOCRINE": "ENDOCRINOLOGY",
     "ENDOCRINOLOGY": "ENDOCRINOLOGY",
 
-    # Rheumatology
+    
     "RHEUM": "RHEUMATOLOGY",
     "RHEUMATOLOGY": "RHEUMATOLOGY",
 
-    # Allergy / Immunology
+    
     "ALLERGY": "ALLERGY IMMUNOLOGY",
     "IMMUNOLOGY": "ALLERGY IMMUNOLOGY",
     "ALLERGY IMMUNOLOGY": "ALLERGY IMMUNOLOGY",
     "ALLERGY/IMMUNOLOGY": "ALLERGY IMMUNOLOGY",
     "A&I": "ALLERGY IMMUNOLOGY",
 
-    # Geriatrics
+    
     "GERI": "GERIATRICS",
     "GERIATRIC": "GERIATRICS",
     "GERIATRICS": "GERIATRICS",
     "ELDER CARE": "GERIATRICS",
 
-    # Palliative / Hospice
+    
     "PALL CARE": "PALLIATIVE CARE",
     "PALLIATIVE": "PALLIATIVE CARE",
     "PALLIATIVE CARE": "PALLIATIVE CARE",
     "HOSPICE": "HOSPICE CARE",
     "HOSPICE CARE": "HOSPICE CARE",
 
-    # ============================================================
-    # FACILITY / STRUCTURE TYPES
-    # ============================================================
+    
+    
+    
 
     "CTR": "CENTER",
     "CTRS": "CENTER",
@@ -308,32 +308,32 @@ HEALTHCARE_SYNONYMS = {
     "RM": "ROOM",
     "ROOM": "ROOM",
 
-    # Ambulatory / outpatient
+    
     "AMB": "AMBULATORY",
     "AMBULATORY": "AMBULATORY",
     "OP": "OUTPATIENT",
     "OUTPATIENT": "OUTPATIENT",
     "OUT PT": "OUTPATIENT",
 
-    # Urgent care
+    
     "UC": "URGENT CARE",
     "URGENT": "URGENT CARE",
     "URGENT CARE": "URGENT CARE",
 
-    # Medical center
+    
     "MC": "MEDICAL CENTER",
     "MED CTR": "MEDICAL CENTER",
     "MEDICAL CTR": "MEDICAL CENTER",
     "MEDICAL CENTER": "MEDICAL CENTER",
 
-    # Community health
+    
     "CHC": "COMMUNITY HEALTH CENTER",
     "COMMUNITY HEALTH": "COMMUNITY HEALTH",
     "COMMUNITY HEALTH CENTER": "COMMUNITY HEALTH CENTER",
 
-    # ============================================================
-    # PROVIDER / PRACTITIONER TERMS
-    # ============================================================
+    
+    
+    
 
     "DR": "DOCTOR",
     "DR.": "DOCTOR",
@@ -375,9 +375,9 @@ HEALTHCARE_SYNONYMS = {
     "PHARMACY": "PHARMACY",
     "PHARMACIST": "PHARMACY",
 
-    # ============================================================
-    # CLINICAL SERVICES
-    # ============================================================
+    
+    
+    
 
     "LAB": "LABORATORY",
     "LABS": "LABORATORY",
@@ -407,9 +407,9 @@ HEALTHCARE_SYNONYMS = {
     "AMB SURG": "AMBULATORY SURGERY CENTER",
     "AMBULATORY SURGERY CENTER": "AMBULATORY SURGERY CENTER",
 
-    # ============================================================
-    # ORGANIZATIONAL / CORPORATE TERMS
-    # ============================================================
+    
+    
+    
 
     "ORG": "ORGANIZATION",
     "ORGANIZATION": "ORGANIZATION",
@@ -435,10 +435,10 @@ HEALTHCARE_SYNONYMS = {
     "IPA": "INDEPENDENT PRACTICE ASSOCIATION",
     "INDEPENDENT PRACTICE ASSOCIATION": "INDEPENDENT PRACTICE ASSOCIATION",
 
-    # ============================================================
-    # LEGAL / BUSINESS SUFFIXES
-    # Usually candidates for removal during entity normalization
-    # ============================================================
+    
+    
+    
+    
 
     "INC": "",
     "INC.": "",
@@ -469,9 +469,9 @@ HEALTHCARE_SYNONYMS = {
     "CO.": "",
     "COMPANY": "",
 
-    # ============================================================
-    # COMMON LOCATION / RELATIONSHIP WORDS
-    # ============================================================
+    
+    
+    
 
     "OF": "",
     "THE": "",
@@ -486,9 +486,9 @@ HEALTHCARE_SYNONYMS = {
     "WITH": "",
     "FROM": "",
 
-    # ============================================================
-    # COMMON HEALTHCARE CONNECTORS / NOISE
-    # ============================================================
+    
+    
+    
 
     "SERVICES": "",
     "SERVICE": "",
@@ -496,9 +496,9 @@ HEALTHCARE_SYNONYMS = {
     "MEDICAL": "MEDICAL",
     "MED": "MEDICAL",
 
-    # ============================================================
-    # MEDICAL / HEALTHCARE GENERAL TERMS
-    # ============================================================
+    
+    
+    
 
     "MEDS": "MEDICAL",
     "MEDICINE": "MEDICAL",
@@ -510,9 +510,9 @@ HEALTHCARE_SYNONYMS = {
     "PATIENT": "PATIENT",
     "PTS": "PATIENT",
 
-    # ============================================================
-    # COMMON ABBREVIATIONS / SPELLING NORMALIZATION
-    # ============================================================
+    
+    
+    
 
     "NORTH": "NORTH",
     "N": "NORTH",
@@ -537,7 +537,6 @@ HEALTHCARE_SYNONYMS = {
 
     "SOUTHWEST": "SOUTHWEST",
     "SW": "SOUTHWEST",
-
 
     "BLVD": "BOULEVARD",
 }

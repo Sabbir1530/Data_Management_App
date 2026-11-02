@@ -11,20 +11,18 @@ import os
 
 ENV_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
 
-# Fixed AI-matching settings (previously exposed in the UI / Settings tab).
 AI_MODEL = "gemini-2.5-flash"
 AI_BATCH_SIZE = 50
 AI_MAX_CONCURRENT = 15
 
-
 def load_api_key():
     if os.path.exists(ENV_PATH):
         try:
-            # utf-8-sig transparently strips a UTF-8 BOM if present. Windows
-            # Notepad often saves new text files with a BOM, which makes a
-            # plain utf-8 read see an invisible "\ufeff" glued onto the
-            # first line — so `line.startswith("GEMINI_API_KEY=")` silently
-            # fails even though the file looks correct when you open it.
+            
+            
+            
+            
+            
             with open(ENV_PATH, "r", encoding="utf-8-sig") as f:
                 for raw_line in f:
                     line = raw_line.strip()
@@ -36,7 +34,6 @@ def load_api_key():
         except Exception:
             pass
     return os.environ.get("GEMINI_API_KEY", "")
-
 
 def env_file_status():
     """Returns (exists, has_key) for diagnostics — used to give a more

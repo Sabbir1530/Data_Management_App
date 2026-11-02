@@ -10,7 +10,6 @@ from pathlib import Path
 
 from shared.services.workspace import get_workspace_path, set_custom_workspace_path
 
-
 class ExpandingEntry(ttk.Entry):
     def __init__(self, master, textvariable=None, min_width=10, max_width=60, **kwargs):
         self._min_width = min_width
@@ -30,7 +29,6 @@ class ExpandingEntry(ttk.Entry):
             self.configure(width=needed)
         except tk.TclError:
             pass
-
 
 class DataLaundryPage(ttk.Frame):
     def __init__(self, master, connection_settings, shared_workspace_var=None, shared_schema_var=None):
@@ -67,7 +65,7 @@ class DataLaundryPage(ttk.Frame):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(3, weight=1)
 
-        # ── Header: server left, metrics right ─────────────────────────
+        
         header = ttk.Frame(self)
         header.grid(row=0, column=0, sticky="ew", pady=(0, 6))
         header.columnconfigure(1, weight=1)
@@ -97,7 +95,7 @@ class DataLaundryPage(ttk.Frame):
         self.lbl_issues.pack(side="left", padx=(12, 0))
         self.lbl_fixed.pack(side="left", padx=(12, 0))
 
-        # ── Workspace selector ─────────────────────────────────────────
+        
         ws_container = ttk.LabelFrame(self, text=" Run Workspace Directory ", padding=8)
         ws_container.grid(row=1, column=0, sticky="ew", pady=(0, 6))
         ws_container.columnconfigure(0, weight=1)
@@ -116,13 +114,13 @@ class DataLaundryPage(ttk.Frame):
         self.ent_ws_dir.bind("<Return>", lambda e: self._on_workspace_input_changed())
         self.ent_ws_dir.bind("<FocusOut>", lambda e: self._on_workspace_input_changed())
 
-        # ── Config card ────────────────────────────────────────────────
+        
         config = ttk.LabelFrame(self, text=" 1. Database & Query ", padding=8)
         config.grid(row=2, column=0, sticky="ew", pady=(0, 6))
         config.columnconfigure(1, weight=1)
         config.columnconfigure(3, weight=1)
 
-        # Row 0: Database | Schema  (tight, no huge gaps)
+        
         ttk.Label(config, text="Database").grid(row=0, column=0, sticky="w")
         self.db_var = tk.StringVar(value=self.connection_settings.database or "TRAINING_DB")
         ExpandingEntry(config, textvariable=self.db_var, min_width=14, max_width=40).grid(
@@ -142,7 +140,7 @@ class DataLaundryPage(ttk.Frame):
             row=0, column=3, sticky="ew", padx=(6, 0), pady=2
         )
 
-        # Row 1: Member column | WHERE on same row, compact
+        
         ttk.Label(config, text="Member Column").grid(row=1, column=0, sticky="w", pady=(4, 0))
         self.col_var = tk.StringVar(value="GM.SRC_GPO_MEMBER_ALT_ID")
         self.col_combo = ttk.Combobox(
@@ -163,7 +161,7 @@ class DataLaundryPage(ttk.Frame):
         self.where_entry.grid(row=1, column=3, sticky="ew", padx=(6, 0), pady=(4, 0))
         self.where_var.trace_add("write", lambda *_: self._update_query_preview())
 
-        # Row 2: Note / Info hint
+        
         note_lbl = ttk.Label(
             config,
             text="Note: Use GM.SRC_GPO_MEMBER_ALT_ID if GM.gpo_member_lic_nr has no value in this column, and use GM.gpo_member_lic_nr if the column GM.SRC_GPO_MEMBER_ALT_ID has no value.",
@@ -173,7 +171,7 @@ class DataLaundryPage(ttk.Frame):
         )
         note_lbl.grid(row=2, column=1, columnspan=3, sticky="w", pady=(2, 6))
 
-        # Row 3: Generated SQL — grows with content
+        
         ttk.Label(config, text="Generated SQL").grid(row=3, column=0, sticky="nw", pady=(8, 0))
         sql_wrap = ttk.Frame(config)
         sql_wrap.grid(row=3, column=1, columnspan=3, sticky="nsew", padx=(6, 0), pady=(8, 0))
@@ -192,7 +190,7 @@ class DataLaundryPage(ttk.Frame):
         self.query_preview.configure(xscrollcommand=sql_xsb.set, yscrollcommand=sql_ysb.set)
         self.query_preview.bind("<<Modified>>", self._on_sql_modified)
 
-        # Row 4: action buttons
+        
         btn_row = ttk.Frame(config)
         btn_row.grid(row=4, column=0, columnspan=4, sticky="ew", pady=(10, 0))
         self.btn_preview = ttk.Button(btn_row, text="Preview (TOP 10)", command=self._run_preview)
@@ -211,7 +209,7 @@ class DataLaundryPage(ttk.Frame):
         )
         self.btn_commit.pack(side="right", padx=(0, 8))
 
-        # ── Table + log ────────────────────────────────────────────────
+        
         split = ttk.Panedwindow(self, orient="vertical")
         split.grid(row=3, column=0, sticky="nsew")
 
@@ -237,7 +235,7 @@ class DataLaundryPage(ttk.Frame):
         )
         self.lbl_table_hint.pack(side="left", padx=10)
 
-        # Excel-like grid style
+        
         style = ttk.Style()
         try:
             style.configure(
@@ -286,7 +284,7 @@ class DataLaundryPage(ttk.Frame):
             "sst": "Sugg ST",
             "szip": "Sugg ZIP",
         }
-        # Relative weights — columns share available width so nothing clips past the box
+        
         self._review_weights = {
             "apply": 0.05,
             "id": 0.08,
@@ -339,7 +337,7 @@ class DataLaundryPage(ttk.Frame):
         lsb.grid(row=0, column=1, sticky="ns")
         self.log_text.configure(yscrollcommand=lsb.set)
 
-    # ── SQL auto-size ─────────────────────────────────────────────────
+    
     def _on_sql_modified(self, event=None):
         try:
             self.query_preview.edit_modified(False)
@@ -350,7 +348,7 @@ class DataLaundryPage(ttk.Frame):
     def _resize_sql_box(self):
         content = self.query_preview.get("1.0", "end-1c")
         lines = content.count("\n") + 1
-        # Grow between 3 and 12 lines based on content
+        
         height = max(3, min(12, lines + 1))
         try:
             self.query_preview.configure(height=height)
@@ -375,7 +373,7 @@ class DataLaundryPage(ttk.Frame):
         self.query_preview.insert("1.0", full_query)
         self._resize_sql_box()
 
-    # ── Reset ─────────────────────────────────────────────────────────
+    
     def reset_session(self):
         """Full new session: cancel work, clear WHERE, metrics, review table, and log."""
         self._cancel = True
@@ -383,7 +381,7 @@ class DataLaundryPage(ttk.Frame):
         self.unresolved_records = []
         self._apply_flags.clear()
 
-        # Clear review / preview table
+        
         self._close_cell_editor()
         self.tree.delete(*self.tree.get_children())
         cols = ("apply", "id", "member", "facility", "ocity", "ost", "ozip", "scity", "sst", "szip")
@@ -396,13 +394,13 @@ class DataLaundryPage(ttk.Frame):
         for c in cols:
             self.tree.heading(c, text=headings[c])
 
-        # Reset metrics (Extracted / Unresolved / Auto-Fixed)
+        
         self.lbl_extracted.config(text="Extracted: 0")
         self.lbl_issues.config(text="Unresolved: 0")
         self.lbl_fixed.config(text="Auto-Fixed: 0")
         self.lbl_table_hint.config(text="Session reset — ready for a new run")
 
-        # Clear WHERE and restore base generated SQL
+        
         self.where_var.set("")
         try:
             self.where_entry.delete(0, tk.END)
@@ -411,7 +409,7 @@ class DataLaundryPage(ttk.Frame):
         self.col_var.set("GM.SRC_GPO_MEMBER_ALT_ID")
         self._update_query_preview()
 
-        # Clear execution log for a clean session
+        
         try:
             self.log_text.config(state="normal")
             self.log_text.delete("1.0", tk.END)
@@ -429,7 +427,7 @@ class DataLaundryPage(ttk.Frame):
 
         self.after(150, _clear_cancel)
 
-    # ── Logging ───────────────────────────────────────────────────────
+    
     def log(self, message: str):
         line = f"[{time.strftime('%H:%M:%S')}] {message}\n"
         with self._ui_lock:
@@ -479,7 +477,7 @@ class DataLaundryPage(ttk.Frame):
         selected_col = self.col_var.get()
         where_clause = self.where_var.get().strip()
 
-        # Alternative column
+        
         if selected_col == "GM.SRC_GPO_MEMBER_ALT_ID":
             alt_col = "GM.gpo_member_lic_nr"
         else:
@@ -507,7 +505,7 @@ class DataLaundryPage(ttk.Frame):
             if empty:
                 self.log(f"  ⚠ Selected column '{selected_col}' is COMPLETELY EMPTY in the database under this WHERE condition.")
 
-                # Check if alt_col is also empty
+                
                 alt_empty = is_column_empty(
                     creds["server"],
                     creds["database"],
@@ -522,7 +520,7 @@ class DataLaundryPage(ttk.Frame):
 
                 def ask_user():
                     if alt_empty:
-                        # Both are empty
+                        
                         cond_msg = f" under the current WHERE condition" if where_clause else ""
                         messagebox.showwarning(
                             "Empty Columns Warning",
@@ -532,7 +530,7 @@ class DataLaundryPage(ttk.Frame):
                         self.log(f"  ⚠ Both columns are empty. Proceeding anyway.")
                         self.after(0, on_done_callback)
                     else:
-                        # Suggest switching
+                        
                         cond_msg = f" under the current WHERE condition" if where_clause else ""
                         msg = (
                             f"The selected column '{selected_col}' is completely empty in the STAGE.GPO_MEMBER table{cond_msg}.\n\n"
@@ -544,7 +542,7 @@ class DataLaundryPage(ttk.Frame):
                             self.col_var.set(alt_col)
                             self._update_query_preview()
 
-                        # Proceed with the callback
+                        
                         self.after(0, on_done_callback)
 
                 self.after(0, ask_user)
@@ -682,7 +680,7 @@ class DataLaundryPage(ttk.Frame):
             total = self.tree.winfo_width()
             if total < 50:
                 return
-            # leave a few px so the last column is not clipped by the border
+            
             usable = max(total - 4, 100)
             cols = ("apply", "id", "member", "facility", "ocity", "ost", "ozip", "scity", "sst", "szip")
             weights = getattr(self, "_review_weights", None) or {c: 0.1 for c in cols}
@@ -735,7 +733,7 @@ class DataLaundryPage(ttk.Frame):
         region = self.tree.identify("region", event.x, event.y)
         if region != "cell":
             return
-        col = self.tree.identify_column(event.x)  # #1 = apply
+        col = self.tree.identify_column(event.x)  
         row = self.tree.identify_row(event.y)
         if not row or row not in self._apply_flags:
             return
@@ -748,7 +746,7 @@ class DataLaundryPage(ttk.Frame):
             return
         col = self.tree.identify_column(event.x)
         row = self.tree.identify_row(event.y)
-        # Only Sugg City (#8), Sugg ST (#9), Sugg ZIP (#10) are editable
+        
         col_index = int(col.replace("#", "")) - 1
         if col_index not in (7, 8, 9) or not row:
             return
@@ -780,7 +778,7 @@ class DataLaundryPage(ttk.Frame):
             if idx < len(vals2):
                 vals2[idx] = new_val
                 self.tree.item(iid2, values=vals2)
-            # Sync into unresolved_records by REC_ID
+            
             rec_id = vals2[1] if len(vals2) > 1 else None
             key = {7: "SUGG_CITY", 8: "SUGG_ST", 9: "SUGG_ZIP"}.get(idx)
             if key and rec_id is not None:

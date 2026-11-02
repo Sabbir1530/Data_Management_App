@@ -21,12 +21,10 @@ from shared.services.database import create_database_engine
 CHECK_ON, CHECK_OFF = "\u2611", "\u2610"
 
 
-# ------------------------------------------------------------------ helpers
 def _run_bg(fn, *a, **kw):
     t = threading.Thread(target=fn, args=a, kwargs=kw, daemon=True)
     t.start()
     return t
-
 
 class LogPanel(ttk.Frame):
     def __init__(self, parent):
@@ -44,7 +42,6 @@ class LogPanel(ttk.Frame):
 
     def set_progress(self, frac: float):
         self.progress["value"] = max(0.0, min(1.0, frac)) * 100
-
 
 class ScrollableFrame(ttk.Frame):
     def __init__(self, container, *args, **kwargs):
@@ -82,7 +79,6 @@ class ScrollableFrame(ttk.Frame):
         self.canvas.yview_scroll(int(-1 * (event.delta / 120)), "units")
 
 
-# ------------------------------------------------------------------ Tab 1: load & map
 class LoadFrame(ttk.Frame):
     def __init__(self, parent, on_ready):
         super().__init__(parent, padding=12)
@@ -158,7 +154,7 @@ class LoadFrame(ttk.Frame):
         guess = excel_io.guess_mapping(self.df.columns)
         options = [excel_io.NONE] + [str(c) for c in self.df.columns]
 
-        # We will split the mapping fields into two columns
+        
         half = (len(excel_io.FIELDS) + 1) // 2
 
         for i, (key, label, required, _aliases) in enumerate(excel_io.FIELDS):
@@ -190,7 +186,6 @@ class LoadFrame(ttk.Frame):
         self.on_ready(self.df.reset_index(drop=True), mapping)
 
 
-# ------------------------------------------------------------------ Tab 2: review & match
 class ReviewFrame(ttk.Frame):
     def __init__(self, parent, app):
         super().__init__(parent, padding=8)
@@ -200,7 +195,7 @@ class ReviewFrame(ttk.Frame):
         self.only_matches = tk.BooleanVar(value=False)
         self._build()
 
-    # ---- layout
+    
     def _build(self):
         ctrl = ttk.LabelFrame(self, text="Run", padding=8)
         ctrl.pack(fill="x")
@@ -282,7 +277,7 @@ class ReviewFrame(ttk.Frame):
         self.btn_next = ttk.Button(pager, text="Next \u25b6", command=self._next_page)
         self.btn_next.pack(side="left")
 
-    # ---- data source
+    
     def _filtered_indices(self):
         s = self.app
         idxs = list(range(len(s.df))) if s.df is not None else []
@@ -330,7 +325,7 @@ class ReviewFrame(ttk.Frame):
         self.page += 1
         self.refresh()
 
-    # ---- row interaction
+    
     def _row_at(self, event):
         iid = self.tree.identify_row(event.y)
         col = self.tree.identify_column(event.x)
@@ -394,7 +389,7 @@ class ReviewFrame(ttk.Frame):
                     lines.append(f"  - {other.eid}: {other.name} | {other.addr}, {other.city}, {other.state} {other.zip}")
         messagebox.showinfo(f"Row {i + 2} details", "\n".join(lines), parent=self)
 
-    # ---- pipeline actions (threaded) ------------------------------------------------
+    
     def _guard(self):
         s = self.app
         if s.df is None:
@@ -599,7 +594,7 @@ class ReviewFrame(ttk.Frame):
         self.app.after0_delayed(400, self.run_ai)
         self.app.after0_delayed(1200, self.compute_suggestions)
 
-    # ---- SQL execution
+    
     def _sql_for_row(self, i):
         s = self.app
         r = s.recs[i]
@@ -679,7 +674,7 @@ class ReviewFrame(ttk.Frame):
 
         _run_bg(work)
 
-    # ---- export
+    
     def export_all(self):
         s = self.app
         if s.df is None:
@@ -751,7 +746,6 @@ class ReviewFrame(ttk.Frame):
             s.sql_text[i] = self._sql_for_row(i)
 
 
-# ------------------------------------------------------------------ App shell
 class MDMApp(ttk.Frame):
     def __init__(self, root, connection_settings):
         super().__init__(root)

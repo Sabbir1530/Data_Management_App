@@ -13,7 +13,6 @@ from openpyxl.utils import get_column_letter
 
 NONE = "(none)"
 
-# key, label, required, aliases (normalised: upper, letters+digits only)
 FIELDS = [
     ("case_id", "CASE_ID", True, ["CASEID"]),
     ("enduser_id", "ENDUSER_ID", True, ["ENDUSERID", "EUID"]),
@@ -28,33 +27,30 @@ FIELDS = [
     ("sales_type", "SALES_TYPE (optional)", False, ["SALESTYPE", "SALES"]),
 ]
 
-
 def sheet_names(path: str) -> List[str]:
     if str(path).lower().endswith(".csv"):
         return ["CSV Data"]
     return pd.ExcelFile(path).sheet_names
 
-
 def read_excel(path: str, sheet) -> pd.DataFrame:
     if str(path).lower().endswith(".csv"):
-        # read_csv with low_memory=False to handle mixed types gracefully
+        
         return pd.read_csv(path, low_memory=False)
     return pd.read_excel(path, sheet_name=sheet)
-
 
 def guess_mapping(columns) -> Dict[str, str]:
     normed = {c: re.sub(r"[^A-Z0-9]", "", str(c).upper()) for c in columns}
     used, out = set(), {}
     for key, _label, _req, aliases in FIELDS:
         pick = ""
-        for a in aliases:                                   # exact alias, best alias first
+        for a in aliases:                                   
             for c, n in normed.items():
                 if n == a and c not in used:
                     pick = c
                     break
             if pick:
                 break
-        if not pick:                                        # fuzzy fallback
+        if not pick:                                        
             best, best_s = "", 0.0
             for c, n in normed.items():
                 if c in used or not n:
@@ -69,7 +65,6 @@ def guess_mapping(columns) -> Dict[str, str]:
         out[key] = pick
     return out
 
-
 def _clean(v):
     if hasattr(v, "item") and not isinstance(v, (str, bytes)):
         try:
@@ -77,7 +72,6 @@ def _clean(v):
         except Exception:
             pass
     return v
-
 
 def export_workbook(path: Path, df: pd.DataFrame, id_col_name: str, corr: List[str], excluded: List[bool],
                     usr: str, info: List[dict], mode: str = "all") -> Path:
@@ -90,7 +84,7 @@ def export_workbook(path: Path, df: pd.DataFrame, id_col_name: str, corr: List[s
 
     idxs = [i for i in range(len(values)) if (excluded[i] if mode == "excluded" else True)]
 
-    # If saving to CSV
+    
     if str(path).lower().endswith(".csv"):
         import csv
         with open(path, "w", newline="", encoding="utf-8") as f:
@@ -110,7 +104,7 @@ def export_workbook(path: Path, df: pd.DataFrame, id_col_name: str, corr: List[s
                 row.append(info[i].get("difference_status", ""))
                 writer.writerow(row)
         
-        # We also generate the review file as a separate CSV if mode is all
+        
         return path
 
     id_letter = get_column_letter(id_pos + 1)

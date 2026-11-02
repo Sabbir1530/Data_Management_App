@@ -40,13 +40,13 @@ class AiValidationTab(ttk.Frame):
         scroller.pack(fill="both", expand=True)
         body = scroller.body
         
-        # File Input
+        
         sec_file = Section(body, "1. Input File (Excel/CSV)")
         sec_file.pack(fill="x", padx=16, pady=(16, 10))
         self.pair_file_picker = FilePicker(sec_file, "File:", on_pick=self._on_pair_file_loaded)
         self.pair_file_picker.pack(fill="x")
         
-        # Mapping
+        
         sec_cols = Section(body, "2. Column Mapping")
         sec_cols.pack(fill="x", padx=16, pady=(0, 10))
         
@@ -78,7 +78,7 @@ class AiValidationTab(ttk.Frame):
         self.pair_id = LabeledCombo(id_row, "Unique ID column (optional):", editable=True)
         self.pair_id.pack(side="left")
         
-        # AI Options
+        
         sec_opt = Section(body, "3. AI Options")
         sec_opt.pack(fill="x", padx=16, pady=(0, 10))
         self.grounding_var = tk.BooleanVar(value=False)
@@ -87,7 +87,7 @@ class AiValidationTab(ttk.Frame):
             variable=self.grounding_var
         ).pack(anchor="w", pady=5)
         
-        # Run
+        
         sec_run = Section(body, "4. Output & Run")
         sec_run.pack(fill="x", padx=16, pady=(0, 10))
         
@@ -107,7 +107,7 @@ class AiValidationTab(ttk.Frame):
         self.pair_status = tk.StringVar(value="Idle")
         ttk.Label(run_row, textvariable=self.pair_status, foreground="#555").pack(side="left")
 
-        # Stats
+        
         pair_stats_row = ttk.Frame(sec_run)
         pair_stats_row.pack(fill="x", pady=(10, 4))
         self.pair_stat_same = StatCard(pair_stats_row, "SAME", color="#047857")
@@ -119,7 +119,7 @@ class AiValidationTab(ttk.Frame):
         self.pair_stat_err = StatCard(pair_stats_row, "ERROR", color="#4b5563")
         self.pair_stat_err.pack(side="left", padx=4)
 
-        # Open File Buttons
+        
         pair_open_row = ttk.Frame(sec_run)
         pair_open_row.pack(fill="x")
         self.pair_open_excel_btn = ttk.Button(pair_open_row, text="Open Results Excel", command=self._open_pair_excel, state="disabled")
@@ -137,7 +137,7 @@ class AiValidationTab(ttk.Frame):
         scroller.pack(fill="both", expand=True)
         body = scroller.body
         
-        # Target HS configuration
+        
         sec_hs = Section(body, "1. Target Health System")
         sec_hs.pack(fill="x", padx=16, pady=(16, 10))
         self.hs_target_name = LabeledEntry(sec_hs, "Target System Name (e.g. 'BJC Health System'):", width=50)
@@ -145,13 +145,13 @@ class AiValidationTab(ttk.Frame):
         self.hs_target_aliases = LabeledEntry(sec_hs, "Aliases/Divisions (comma-separated):", width=70)
         self.hs_target_aliases.pack(anchor="w", pady=2)
         
-        # File Input
+        
         sec_file = Section(body, "2. Input File (Excel/CSV)")
         sec_file.pack(fill="x", padx=16, pady=(0, 10))
         self.hs_file_picker = FilePicker(sec_file, "File:", on_pick=self._on_hs_file_loaded)
         self.hs_file_picker.pack(fill="x")
         
-        # Mapping
+        
         sec_cols = Section(body, "3. Column Mapping")
         sec_cols.pack(fill="x", padx=16, pady=(0, 10))
         
@@ -176,7 +176,7 @@ class AiValidationTab(ttk.Frame):
         self.hs_id = LabeledCombo(row3, "Unique ID column (optional):", editable=True)
         self.hs_id.pack(side="left")
         
-        # Run
+        
         sec_run = Section(body, "4. Output & Run")
         sec_run.pack(fill="x", padx=16, pady=(0, 10))
         
@@ -196,7 +196,7 @@ class AiValidationTab(ttk.Frame):
         self.hs_status = tk.StringVar(value="Idle")
         ttk.Label(run_row, textvariable=self.hs_status, foreground="#555").pack(side="left")
 
-        # Stats
+        
         hs_stats_row = ttk.Frame(sec_run)
         hs_stats_row.pack(fill="x", pady=(10, 4))
         self.hs_stat_true = StatCard(hs_stats_row, "TRUE", color="#047857")
@@ -204,7 +204,7 @@ class AiValidationTab(ttk.Frame):
         self.hs_stat_false = StatCard(hs_stats_row, "FALSE", color="#b91c1c")
         self.hs_stat_false.pack(side="left", padx=4)
 
-        # Open File Buttons
+        
         hs_open_row = ttk.Frame(sec_run)
         hs_open_row.pack(fill="x")
         self.hs_open_excel_btn = ttk.Button(hs_open_row, text="Open Results Excel", command=self._open_hs_excel, state="disabled")
@@ -229,12 +229,12 @@ class AiValidationTab(ttk.Frame):
             self.pair_input_path = path
             cols = [""] + list(self.pair_df.columns)
             
-            # Entity 1 (left to right)
+            
             self.pair_n1.set_values(cols, default=guess_column(cols, [], ["nm", "name"], fallback="", required=False, reverse=False))
             self.pair_a1.set_values(cols, default=guess_column(cols, [], ["addr", "address", "street"], fallback="", required=False, reverse=False))
             self.pair_c1.set_values(cols, default=guess_column(cols, [], ["city"], fallback="", required=False, reverse=False))
             
-            # Entity 2 (right to left)
+            
             self.pair_n2.set_values(cols, default=guess_column(cols, [], ["nm", "name"], fallback="", required=False, reverse=True))
             self.pair_a2.set_values(cols, default=guess_column(cols, [], ["addr", "address", "street"], fallback="", required=False, reverse=True))
             self.pair_c2.set_values(cols, default=guess_column(cols, [], ["city"], fallback="", required=False, reverse=True))

@@ -10,14 +10,12 @@ import pandas as pd
 
 EARTH_RADIUS_METERS = 6371000
 
-
 def _invalid_coord_mask(series):
     """True where a coordinate cell can't be used for matching (missing or
     non-numeric). Using numeric coercion instead of plain isna() catches
     blank/whitespace-only cells that isna() alone would miss, so rows aren't
     silently dropped from the join without being accounted for."""
     return pd.to_numeric(series, errors="coerce").isna()
-
 
 def spatial_join(
     df_left,
@@ -86,7 +84,6 @@ def spatial_join(
     dist_col = merged.pop("DISTANCE_M")
     merged.insert(0, "DISTANCE_M", dist_col)
     return merged, skipped_left, skipped_right
-
 
 def run_tiered_distance_matching(
     hsp_df,

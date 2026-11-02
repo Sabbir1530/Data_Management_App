@@ -23,18 +23,15 @@ from shared.services.workspace import global_cache_dir, cache_dir, output_dir
 
 load_dotenv()
 
-# Setup logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-# Initialize Gemini Client
 api_key = os.getenv("GEMINI_API_KEY")
 if api_key:
     client = genai.Client(api_key=api_key)
 else:
     client = None
 
-# Global configuration defaults
 DB_SERVER = os.getenv("DB_SERVER", "")
 DB_NAME = os.getenv("DB_NAME", "")
 DB_USER = os.getenv("DB_USER", "")
@@ -70,7 +67,7 @@ def _get_conn_str():
     modern = d.startswith("ODBC Driver")
     trust = "TrustServerCertificate=yes;" if modern else ""
     return (
-        f"DRIVER={{{d}}};"
+        f"DRIVER={ {d}} ;"
         f"SERVER={DB_SERVER};"
         f"DATABASE={DB_NAME};"
         f"UID={DB_USER};"
@@ -96,18 +93,16 @@ NUMBER_WORDS = {
 
 geolocator = ArcGIS(user_agent="medical_master_geocoder_step1")
 
-# Global cancellation flag
 CANCEL_EVENT = threading.Event()
 
-# -------------------------------------------------------------------------
-# 1. Local Caching (SQLite for Geocode & AI Engine)
-# -------------------------------------------------------------------------
+
+
 def init_run_databases(run_dir):
     os.makedirs(run_dir, exist_ok=True)
     c_dir = cache_dir()
     c_dir.mkdir(parents=True, exist_ok=True)
 
-    # Init AI Cache DB
+    
     ai_db_path = os.path.join(c_dir, "ai_matching_cache.db")
     conn = sqlite3.connect(ai_db_path)
     conn.execute("""
@@ -125,7 +120,7 @@ def init_run_databases(run_dir):
     conn.commit()
     conn.close()
 
-    # Init Geocode Cache DB
+    
     geo_db_path = os.path.join(c_dir, "geocode_cache.db")
     conn = sqlite3.connect(geo_db_path)
     conn.execute("""
@@ -182,9 +177,8 @@ def save_batch_to_ai_cache(run_dir, batch_data):
     conn.commit()
     conn.close()
 
-# -------------------------------------------------------------------------
-# 2. Text Normalization & Spatial Fuzzy Matcher
-# -------------------------------------------------------------------------
+
+
 def normalize_numbers(text: str) -> str:
     if not text:
         return ""
@@ -215,7 +209,7 @@ def calculate_master_weighted_fuzzy_score(raw_name_clean, master_name_clean):
     matched_count = 0
     raw_used = set()
 
-    # Word-by-word comparison allowing for minor typos
+    
     for m_token in master_tokens:
         best_score = 0.0
         best_r_idx = -1
@@ -224,35 +218,35 @@ def calculate_master_weighted_fuzzy_score(raw_name_clean, master_name_clean):
             if i in raw_used:
                 continue
 
-            # Exact match is 100
+            
             if m_token == r_token:
                 best_score = 100.0
                 best_r_idx = i
                 break
 
-            # Check for typo (using ratio)
+            
             score = fuzz.ratio(m_token, r_token)
             if score > best_score:
                 best_score = score
                 best_r_idx = i
 
-        # 80.0 threshold means minor typos allowed, but random letters won't match
+        
         if best_score >= 80.0:
             matched_score_total += best_score
             matched_count += 1
             raw_used.add(best_r_idx)
 
-    # If NO valid words or typos matched, prevent character-level false positives
+    
     if matched_count == 0:
         return 0.0
 
-    # Base coverage: what percentage of master words found a match?
+    
     coverage_ratio = matched_count / len(master_tokens)
 
-    # Average quality of the word matches (penalizes if words only match via typos)
+    
     word_quality_score = matched_score_total / len(master_tokens)
 
-    # Penalty for significant length mismatch (strict 75%)
+    
     length_ratio = min(len(raw_name_clean), len(master_name_clean)) / len(master_name_clean)
 
     adjusted_score = (word_quality_score * 0.40) + (coverage_ratio * 100.0 * 0.60)
@@ -308,9 +302,8 @@ def run_spatial_fuzzy_match_split(df_temp_input, df_company, threshold_meters, s
 
     return df_merged[df_merged['FUZZY_SCORE'] >= 75.0].copy(), df_merged[df_merged['FUZZY_SCORE'] < 75.0].copy()
 
-# -------------------------------------------------------------------------
-# 3. AI Async Engine
-# -------------------------------------------------------------------------
+
+
 async def call_gemini_api(bp_name, bp_addr, dm_name, dm_addr, semaphore) -> EntityMatchDecision:
     prompt = f"Compare ENTITY 1 (UPD): Name: {bp_name}, Addr: {bp_addr}\nENTITY 2 (CMPNY): Name: {dm_name}, Addr: {dm_addr}"
     system_instruction = (
@@ -359,9 +352,8 @@ async def process_batch_async(batch_df, semaphore):
     ]
     return await asyncio.gather(*tasks)
 
-# -------------------------------------------------------------------------
-# 4. Database Updater & Excel Exporter
-# -------------------------------------------------------------------------
+
+
 def ensure_required_columns_exist(cursor, target_schema_table, log_func):
     """Checks if MTCH_MTHD and distance columns exist in target table; adds them if missing."""
     try:
@@ -369,7 +361,7 @@ def ensure_required_columns_exist(cursor, target_schema_table, log_func):
         table_name = parts[-1].replace("[", "").replace("]", "")
         schema_name = parts[-2].replace("[", "").replace("]", "") if len(parts) > 1 else 'dbo'
 
-        # Check MTCH_MTHD
+        
         cursor.execute(
             "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND COLUMN_NAME = 'MTCH_MTHD'",
             (schema_name, table_name)
@@ -380,7 +372,7 @@ def ensure_required_columns_exist(cursor, target_schema_table, log_func):
             cursor.commit()
             log_func("Column 'MTCH_MTHD' added successfully.")
 
-        # Check distance
+        
         cursor.execute(
             "SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ? AND COLUMN_NAME = 'distance'",
             (schema_name, table_name)
@@ -412,17 +404,17 @@ def filter_and_update_db(candidate_matches, target_schema_table, log_func, conn_
 
     df = pd.DataFrame(candidate_matches, columns=['rec_id', 'cmpny_id', 'match_type', 'distance', 'fuzzy_score', 'is_hsp'])
     df['type_priority'] = df['match_type'].map({'SAME': 1, 'AFFILIATED': 2}).fillna(99)
-    df['hsp_priority'] = df['is_hsp'].apply(lambda x: 0 if x == 1 else 1) # 0 is better (HSP) than 1 (Non-HSP)
+    df['hsp_priority'] = df['is_hsp'].apply(lambda x: 0 if x == 1 else 1) 
     df['distance'] = df['distance'].fillna(999999.0)
     df['fuzzy_score'] = df['fuzzy_score'].fillna(0.0)
 
-    # Sort hierarchy: type_priority ASC, hsp_priority ASC, distance ASC, fuzzy_score DESC
+    
     df_sorted = df.sort_values(
         by=['type_priority', 'hsp_priority', 'distance', 'fuzzy_score'],
         ascending=[True, True, True, False]
     )
 
-    # Pick top candidate per unique rec_id
+    
     df_deduped = df_sorted.groupby('rec_id', as_index=False).first()
     update_pairs = [
         (str(r.cmpny_id), float(r.distance) if pd.notna(r.distance) and r.distance != 999999.0 else None, str(r.rec_id))
@@ -432,7 +424,7 @@ def filter_and_update_db(candidate_matches, target_schema_table, log_func, conn_
     sql_conn = pyodbc.connect(conn_str)
     cursor = sql_conn.cursor()
 
-    # Ensure required columns exist before issuing UPDATE statement
+    
     ensure_required_columns_exist(cursor, target_schema_table, log_func)
 
     cursor.fast_executemany = True
@@ -480,9 +472,8 @@ def export_results_to_excel(run_dir, unmatched_context_df, log_func):
     excel_path = save_dataframe(export_df, excel_path)
     log_func(f"Excel/CSV report saved: {excel_path} ({len(export_df):,} rows)")
 
-# -------------------------------------------------------------------------
-# 5. Pipeline Logic
-# -------------------------------------------------------------------------
+
+
 def get_global_company_data(table_name, sql_query, csv_path, log_func, conn_str):
     if os.path.exists(csv_path):
         log_func(f"[GLOBAL CACHE HIT] Loading '{table_name}' from CSV...")

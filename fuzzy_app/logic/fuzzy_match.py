@@ -37,12 +37,10 @@ def _word_similarity(set1: set, set2: set) -> float:
 DEFAULT_PRIORITY_KEYWORDS = ["healthcare", "hospital", "health", "clinic"]
 EARTH_RADIUS_METERS = 6371000
 
-
 def _check_priority_keywords(text, keywords):
     text_lower = str(text).lower()
     return any(re.search(r"\b" + re.escape(kw.strip()) + r"\b", text_lower)
                for kw in keywords if kw.strip())
-
 
 def _haversine_m(lat1, lon1, lat2, lon2):
     try:
@@ -55,7 +53,6 @@ def _haversine_m(lat1, lon1, lat2, lon2):
     dlat, dlon = lat2 - lat1, lon2 - lon1
     a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
     return EARTH_RADIUS_METERS * 2 * math.asin(math.sqrt(a))
-
 
 def run_fuzzy_matching(
     df,
@@ -147,8 +144,8 @@ def run_fuzzy_matching(
         df["DISTANCE_M"] = [round(d, 2) if d is not None else None for d in distances]
     df["_IS_MATCH"] = is_match_flags
 
-    df_matches = df[df["_IS_MATCH"] == True].copy()      # noqa: E712
-    df_differences = df[df["_IS_MATCH"] == False].copy()  # noqa: E712
+    df_matches = df[df["_IS_MATCH"] == True].copy()      
+    df_differences = df[df["_IS_MATCH"] == False].copy()  
 
     df_matches["SUGGESTION"] = ""
     if generate_suggestions and not df_matches.empty:
@@ -159,9 +156,9 @@ def run_fuzzy_matching(
         group_col = suggestion_group_col if (suggestion_group_col and
                                               suggestion_group_col in df_matches.columns) else name2_col
 
-        # When distance is available it's the tie-breaker after the fuzzy
-        # score (a NaN/missing distance sorts last, so it never beats a
-        # candidate we actually measured).
+        
+        
+        
         sort_cols = [group_col, "_HAS_PRIORITY", "MATCH_SCORE"]
         sort_asc = [True, False, False]
         if use_distance:

@@ -7,7 +7,6 @@ from tkinter import ttk, messagebox, filedialog
 from project_app.services.distance_pipeline import execute_pipeline, CANCEL_EVENT, logger
 from shared.services.workspace import get_workspace_path, set_custom_workspace_path, get_last_schema
 
-
 class DistanceMatchingPage(ttk.Frame):
     def __init__(self, master, connection_settings=None, shared_workspace_var=None, shared_schema_var=None):
         super().__init__(master)
@@ -15,7 +14,7 @@ class DistanceMatchingPage(ttk.Frame):
         self.shared_workspace_var = shared_workspace_var
         self.shared_schema_var = shared_schema_var
 
-        # Database Name Entry
+        
         tk.Label(self, text="Database Name:", font=("Arial", 10, "bold")).pack(anchor="w", padx=15, pady=(15, 2))
         
         default_db = getattr(self.connection_settings, "database", "TRAINING_DB") if self.connection_settings else "TRAINING_DB"
@@ -24,7 +23,7 @@ class DistanceMatchingPage(ttk.Frame):
         self.ent_db = ttk.Entry(self, textvariable=self.db_var, width=78)
         self.ent_db.pack(anchor="w", padx=15, pady=2)
 
-        # Database Schema Entry
+        
         tk.Label(self, text="Database Schema:", font=("Arial", 10, "bold")).pack(anchor="w", padx=15, pady=(10, 2))
         
         self.schema_var = self.shared_schema_var if self.shared_schema_var else tk.StringVar(value=get_last_schema() or "suham_q1")
@@ -37,7 +36,7 @@ class DistanceMatchingPage(ttk.Frame):
             set_last_schema(self.schema_var.get())
         self.schema_var.trace_add("write", _on_schema_changed)
 
-        # Workspace Directory Picker
+        
         tk.Label(self, text="Run Workspace Directory:", font=("Arial", 10, "bold")).pack(anchor="w", padx=15, pady=(10, 2))
         frame_dir = tk.Frame(self)
         frame_dir.pack(fill="x", padx=15, pady=2)
@@ -52,8 +51,7 @@ class DistanceMatchingPage(ttk.Frame):
         self.ent_dir.bind("<Return>", lambda e: self._on_workspace_input_changed())
         self.ent_dir.bind("<FocusOut>", lambda e: self._on_workspace_input_changed())
 
-
-        # Action Buttons Control Frame
+        
         frame_btns = tk.Frame(self)
         frame_btns.pack(anchor="w", padx=15, pady=12)
 
@@ -66,12 +64,12 @@ class DistanceMatchingPage(ttk.Frame):
         self.btn_stop = tk.Button(frame_btns, text="Stop Execution", bg="#c62828", fg="white", font=("Arial", 10, "bold"), state="disabled", command=self.stop_pipeline)
         self.btn_stop.pack(side="left")
 
-        # Progress Bar
+        
         tk.Label(self, text="Overall Progress:", font=("Arial", 10, "bold")).pack(anchor="w", padx=15, pady=(5, 2))
         self.progress = ttk.Progressbar(self, orient="horizontal", length=685, mode="determinate")
         self.progress.pack(anchor="w", padx=15, pady=(0, 10))
 
-        # Execution Terminal Output
+        
         tk.Label(self, text="Execution Log:", font=("Arial", 10, "bold")).pack(anchor="w", padx=15, pady=(5, 2))
         self.txt_log = tk.Text(self, state="disabled", bg="#1e1e1e", fg="#00ff00", font=("Consolas", 9))
         self.txt_log.pack(fill="both", expand=True, padx=15, pady=(0, 15))
@@ -123,14 +121,13 @@ class DistanceMatchingPage(ttk.Frame):
             messagebox.showerror("Input Error", "Database, Schema, and Run folder paths are required.")
             return
 
-
         self.btn_run.config(state="disabled")
         self.btn_rerun.config(state="disabled")
         self.btn_stop.config(state="normal")
         
         self.log(f"\n[SYSTEM] {init_msg}")
         
-        # Build the dynamic connection string based on the provided DB and existing creds
+        
         from project_app.services.matching import build_pyodbc_conn_str
         conn_str = ""
         if self.connection_settings:
