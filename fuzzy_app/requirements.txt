@@ -1,0 +1,9 @@
+pandas
+numpy
+openpyxl
+thefuzz
+rapidfuzz
+geopy
+pydantic
+python-dotenv
+google-genai

@@ -1,0 +1,11 @@
+geopy
+google-genai
+numpy
+openpyxl
+pandas
+pydantic
+pyodbc
+python-dotenv
+rapidfuzz
+sqlalchemy
+thefuzz

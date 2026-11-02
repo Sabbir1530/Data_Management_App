@@ -1,0 +1,8 @@
+pandas
+openpyxl
+sqlalchemy
+pyodbc
+rapidfuzz
+google-genai
+pydantic
+python-dotenv
