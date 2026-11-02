@@ -1,4 +1,4 @@
-#Master Data Management (MDM)
+## Master Data Management (MDM)
 
 This project is a comprehensive desktop application designed to streamline, deduplicate, and master healthcare and facility data. It unifies three powerful data-processing workflows into a single interface, combining traditional fuzzy matching algorithms with AI-powered entity resolution via the Google Gemini API.
 
